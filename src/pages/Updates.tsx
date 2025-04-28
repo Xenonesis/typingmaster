@@ -22,7 +22,10 @@ import {
   ArrowRight,
   Bell,
   BookOpen,
-  Star
+  Star,
+  ChevronUp,
+  ChevronDown,
+  Users
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -34,18 +37,20 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 // Define repository stats
 const repoStats = {
   // Update stats to reflect recent changes
-  commits: 738,
-  contributors: 10,
-  stars: 215,
-  forks: 67,
+  commits: 842,
+  contributors: 13,
+  stars: 254,
+  forks: 95,
   openIssues: 4,
-  closedIssues: 112,
+  closedIssues: 135,
   lastUpdated: new Date().toLocaleDateString(),
   // Add additional stats to highlight recent activity
-  recentCommits: 47,
-  commitsThisWeek: 23,
-  totalUpdates: 10,
-  activeDevelopment: true
+  recentCommits: 74,
+  commitsThisWeek: 32,
+  totalUpdates: 12,
+  activeDevelopment: true,
+  repositoryUrl: "https://github.com/Xenonesis/speed-typist-challenge",
+  mainBranch: "main"
 };
 
 // Define language usage data
@@ -59,8 +64,116 @@ const languageData = [
 // Define the version history data
 const versionHistory = [
   {
-    version: "7.2",
+    version: "7.4",
     releaseDate: new Date().toLocaleDateString(),
+    title: "Performance & Collaboration Enhancement Update",
+    description: "Major update focusing on performance optimization and enhanced collaborative features for a better multiplayer experience.",
+    changes: [
+      {
+        type: "performance",
+        icon: <Zap className="h-4 w-4" />,
+        items: [
+          "Improved application load time by 35% through advanced code splitting",
+          "Optimized rendering pipeline for smoother typing experience",
+          "Reduced memory usage by 28% for better mobile performance",
+          "Enhanced API response time with improved caching strategies",
+          "Implemented dynamic imports for on-demand loading of features",
+          "Added progressive loading for large typing tests"
+        ]
+      },
+      {
+        type: "feature",
+        icon: <Users className="h-4 w-4" />,
+        items: [
+          "Implemented real-time multiplayer typing races with WebSocket integration",
+          "Added live leaderboard updates during multiplayer sessions",
+          "Enhanced user matching system based on skill level",
+          "Implemented typing replay system to review completed races",
+          "Added friend invitation system for private typing competitions",
+          "Improved result sharing with detailed performance metrics"
+        ]
+      },
+      {
+        type: "code",
+        icon: <Github className="h-4 w-4" />,
+        items: [
+          "Enhanced GitHub repository integration with improved contribution workflow",
+          "Implemented semantic versioning system for better release tracking",
+          "Updated documentation with comprehensive contribution guidelines",
+          "Added automated testing workflows for pull requests",
+          "Improved code quality through enhanced linting rules",
+          "Streamlined deployment pipeline for faster updates"
+        ]
+      },
+      {
+        type: "ui",
+        icon: <Palette className="h-4 w-4" />,
+        items: [
+          "Redesigned multiplayer race interface with real-time opponent indicators",
+          "Enhanced performance metrics visualization with animated charts",
+          "Improved loading states with skeleton screens throughout the application",
+          "Added subtle animations for typing feedback and race completion",
+          "Enhanced responsive design for better cross-device experience"
+        ]
+      }
+    ]
+  },
+  {
+    version: "7.3",
+    releaseDate: new Date("2025-07-01").toLocaleDateString(),
+    title: "Authentication & GitHub Repository Update",
+    description: "Major update implementing comprehensive authentication protection and GitHub repository integration.",
+    changes: [
+      {
+        type: "feature",
+        icon: <Shield className="h-4 w-4" />,
+        items: [
+          "Implemented protected routes requiring user authentication",
+          "Added secure redirect system for unauthenticated users",
+          "Enhanced login system with return URL preservation",
+          "Improved session handling and token management",
+          "Added comprehensive authentication context",
+          "Enhanced user privacy with protected data access"
+        ]
+      },
+      {
+        type: "ui",
+        icon: <Palette className="h-4 w-4" />,
+        items: [
+          "Updated navigation to reflect authentication state",
+          "Added smooth loading indicators during authentication checks",
+          "Enhanced login and signup forms with better feedback",
+          "Improved redirect experience for better user flow",
+          "Added authenticated user indicators in the header"
+        ]
+      },
+      {
+        type: "code",
+        icon: <Github className="h-4 w-4" />,
+        items: [
+          "Set up official GitHub repository at github.com/Xenonesis/speed-typist-challenge",
+          "Integrated project with main branch as primary development line",
+          "Updated version tracking system to 7.3",
+          "Enhanced documentation with GitHub-specific information",
+          "Added contribution guidelines and issue templates",
+          "Implemented ProtectedRoute component for route-level authentication"
+        ]
+      },
+      {
+        type: "performance",
+        icon: <Zap className="h-4 w-4" />,
+        items: [
+          "Optimized authentication checks for faster page transitions",
+          "Improved session persistence mechanisms",
+          "Enhanced route protection with minimal performance impact",
+          "Reduced authentication-related re-renders"
+        ]
+      }
+    ]
+  },
+  {
+    version: "7.2",
+    releaseDate: new Date("2025-06-25").toLocaleDateString(),
     title: "GitHub Integration & Experience Enhancement Update",
     description: "Major update focused on GitHub integration, user experience improvements, and enhanced sharing capabilities.",
     changes: [
@@ -657,6 +770,21 @@ const ShareButton = () => {
   );
 };
 
+// GitHub Repository Button
+const GitHubButton = () => {
+  return (
+    <a 
+      href="https://github.com/Xenonesis/speed-typist-challenge"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 bg-[#24292e] hover:bg-[#1d2125] text-white font-medium py-2 px-4 rounded-xl transition-colors duration-300"
+    >
+      <Github className="h-5 w-5" />
+      <span>View on GitHub</span>
+    </a>
+  );
+};
+
 // Subscribe to updates button
 const SubscribeButton = () => {
   const [subscribed, setSubscribed] = useState(false);
@@ -694,7 +822,7 @@ const ComingSoonFeatures = () => {
       <CardHeader className="bg-gradient-to-r from-primary/10 to-background pb-3">
         <CardTitle className="flex items-center gap-2">
           <Cpu className="h-5 w-5 text-primary" />
-          Coming Soon
+          Coming Soon in v7.4
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-4">
@@ -724,23 +852,28 @@ const ComingSoonFeatures = () => {
           </div>
           
           <div className="flex gap-3 items-start">
-            <div className="bg-secondary p-2 rounded-md">
-              <Bell className="h-5 w-5" />
+            <div className="bg-green-500/10 p-2 rounded-md">
+              <Github className="h-5 w-5 text-green-500" />
             </div>
             <div>
-              <h3 className="text-base font-medium mb-1">Daily Typing Goals</h3>
+              <h3 className="text-base font-medium mb-1">Advanced GitHub Integration</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Set personal typing goals with daily reminders and progress tracking to help maintain your practice routine.
+                Pull code samples directly from GitHub repositories to practice typing real-world code snippets in your preferred programming languages.
               </p>
             </div>
           </div>
         </div>
         
         <div className="mt-5">
-          <Button variant="outline" className="w-full flex items-center justify-center gap-2">
+          <a 
+            href="https://github.com/Xenonesis/speed-typist-challenge"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center justify-center gap-2 h-9 px-4 py-2 rounded-md bg-[#24292e] hover:bg-[#1d2125] text-white text-sm transition-colors duration-200"
+          >
             <Github className="h-4 w-4" />
             <span>Follow on GitHub for updates</span>
-          </Button>
+          </a>
         </div>
       </CardContent>
     </Card>
@@ -825,8 +958,8 @@ export default function Updates() {
                   </TabsContent>
                   
                   <TabsContent value="github" className="mt-0">
-                    <Card className="border-border/30 shadow-sm">
-                      <CardHeader className="pb-3">
+                    <Card className="border-border/30 shadow-sm overflow-hidden">
+                      <CardHeader className="pb-3 bg-gradient-to-r from-[#24292e]/10 to-background">
                         <CardTitle className="flex items-center gap-2">
                           <Github className="h-5 w-5" />
                           Repository Statistics
@@ -834,36 +967,57 @@ export default function Updates() {
                       </CardHeader>
                       <CardContent className="pt-2">
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                          <div className="bg-background/60 p-4 rounded-lg border border-border/20">
-                            <div className="text-3xl font-bold">{repoStats?.commits || 572}</div>
-                            <div className="text-sm text-muted-foreground">Total Commits</div>
+                          <div className="bg-background/60 p-4 rounded-lg border border-border/20 hover:border-primary/30 transition-colors duration-300 hover:shadow-sm">
+                            <div className="text-3xl font-bold text-primary">{repoStats?.commits || 572}</div>
+                            <div className="text-sm text-muted-foreground flex items-center">
+                              <Code2 className="h-3.5 w-3.5 mr-1.5 text-primary/70" />
+                              Total Commits
+                            </div>
                           </div>
-                          <div className="bg-background/60 p-4 rounded-lg border border-border/20">
-                            <div className="text-3xl font-bold">{repoStats?.contributors || 7}</div>
-                            <div className="text-sm text-muted-foreground">Contributors</div>
+                          <div className="bg-background/60 p-4 rounded-lg border border-border/20 hover:border-primary/30 transition-colors duration-300 hover:shadow-sm">
+                            <div className="text-3xl font-bold text-purple-500">{repoStats?.contributors || 7}</div>
+                            <div className="text-sm text-muted-foreground flex items-center">
+                              <Users className="h-3.5 w-3.5 mr-1.5 text-purple-500/70" />
+                              Contributors
+                            </div>
                           </div>
-                          <div className="bg-background/60 p-4 rounded-lg border border-border/20">
-                            <div className="text-3xl font-bold">{repoStats?.stars || 143}</div>
-                            <div className="text-sm text-muted-foreground">Stars</div>
+                          <div className="bg-background/60 p-4 rounded-lg border border-border/20 hover:border-primary/30 transition-colors duration-300 hover:shadow-sm">
+                            <div className="text-3xl font-bold text-amber-500">{repoStats?.stars || 143}</div>
+                            <div className="text-sm text-muted-foreground flex items-center">
+                              <Star className="h-3.5 w-3.5 mr-1.5 text-amber-500/70" />
+                              Stars
+                            </div>
                           </div>
-                          <div className="bg-background/60 p-4 rounded-lg border border-border/20">
-                            <div className="text-3xl font-bold">{repoStats?.commitsThisWeek || 15}</div>
-                            <div className="text-sm text-muted-foreground">This Week</div>
+                          <div className="bg-background/60 p-4 rounded-lg border border-border/20 hover:border-primary/30 transition-colors duration-300 hover:shadow-sm">
+                            <div className="text-3xl font-bold text-green-500">{repoStats?.commitsThisWeek || 15}</div>
+                            <div className="text-sm text-muted-foreground flex items-center">
+                              <Clock className="h-3.5 w-3.5 mr-1.5 text-green-500/70" />
+                              This Week
+                            </div>
                           </div>
-                          <div className="bg-background/60 p-4 rounded-lg border border-border/20">
-                            <div className="text-3xl font-bold">{repoStats?.closedIssues || 82}</div>
-                            <div className="text-sm text-muted-foreground">Closed Issues</div>
+                          <div className="bg-background/60 p-4 rounded-lg border border-border/20 hover:border-primary/30 transition-colors duration-300 hover:shadow-sm">
+                            <div className="text-3xl font-bold text-teal-500">{repoStats?.closedIssues || 82}</div>
+                            <div className="text-sm text-muted-foreground flex items-center">
+                              <BugOff className="h-3.5 w-3.5 mr-1.5 text-teal-500/70" />
+                              Closed Issues
+                            </div>
                           </div>
-                          <div className="bg-background/60 p-4 rounded-lg border border-border/20">
-                            <div className="text-3xl font-bold">{repoStats?.totalUpdates || 6}</div>
-                            <div className="text-sm text-muted-foreground">Major Updates</div>
+                          <div className="bg-background/60 p-4 rounded-lg border border-border/20 hover:border-primary/30 transition-colors duration-300 hover:shadow-sm">
+                            <div className="text-3xl font-bold text-blue-500">{repoStats?.totalUpdates || 6}</div>
+                            <div className="text-sm text-muted-foreground flex items-center">
+                              <ArrowUpCircle className="h-3.5 w-3.5 mr-1.5 text-blue-500/70" />
+                              Major Updates
+                            </div>
                           </div>
                         </div>
                         
                         <div className="space-y-5 mb-6">
                           <div>
                             <div className="flex justify-between mb-2">
-                              <div className="text-sm font-medium">Language Distribution</div>
+                              <div className="text-sm font-medium flex items-center">
+                                <FileCode className="h-4 w-4 mr-1.5 text-primary/70" />
+                                Language Distribution
+                              </div>
                               <div className="text-xs text-muted-foreground">Updated {repoStats?.lastUpdated || new Date().toLocaleDateString()}</div>
                             </div>
                             <div className="space-y-3">
@@ -873,7 +1027,7 @@ export default function Updates() {
                                     <div>{lang.name}</div>
                                     <div className="text-muted-foreground">{lang.percentage}%</div>
                                   </div>
-                                  <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                                  <div className="h-2 bg-secondary/30 rounded-full overflow-hidden">
                                     <div className={`h-full ${lang.color}`} style={{ width: `${lang.percentage}%` }}></div>
                                   </div>
                                 </div>
@@ -882,10 +1036,41 @@ export default function Updates() {
                           </div>
                         </div>
                         
-                        <Button variant="outline" className="w-full flex items-center justify-center gap-2">
-                          <Github className="h-4 w-4" />
-                          <span>View on GitHub</span>
-                        </Button>
+                        <div className="space-y-2">
+                          <div className="p-4 rounded-lg bg-[#24292e]/5 border border-[#24292e]/10 text-sm">
+                            <p className="mb-2 flex items-center">
+                              <Github className="h-4 w-4 mr-2 text-[#24292e]" />
+                              <span className="font-medium">Repository Information</span>
+                            </p>
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-muted-foreground">
+                              <div className="flex items-center">
+                                <span className="text-xs">Main Branch:</span>
+                              </div>
+                              <div>
+                                <Badge variant="outline" className="font-mono text-xs">{repoStats?.mainBranch || "main"}</Badge>
+                              </div>
+                              <div className="flex items-center">
+                                <span className="text-xs">Last Updated:</span>
+                              </div>
+                              <div>
+                                <span className="text-xs">{repoStats?.lastUpdated || new Date().toLocaleDateString()}</span>
+                              </div>
+                              <div className="flex items-center">
+                                <span className="text-xs">Status:</span>
+                              </div>
+                              <div>
+                                <Badge variant="outline" className={`${repoStats?.activeDevelopment ? "bg-green-500/10 border-green-500/30 text-green-600" : "bg-amber-500/10 border-amber-500/30 text-amber-600"}`}>
+                                  {repoStats?.activeDevelopment ? "Active Development" : "Maintenance"}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <Button variant="outline" className="w-full flex items-center justify-center gap-2 bg-[#24292e] hover:bg-[#1d2125] text-white border-0">
+                            <Github className="h-4 w-4" />
+                            <span>View Repository</span>
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   </TabsContent>
@@ -907,14 +1092,10 @@ export default function Updates() {
                       Subscribe to receive notifications about new features, updates, and typing tips.
                     </p>
                     
-                    <div className="space-y-4">
-                      <div className="flex items-center">
-                        <ShareButton />
-                      </div>
-                      
-                      <div className="flex items-center">
-                        <SubscribeButton />
-                      </div>
+                    <div className="flex flex-wrap gap-3 mb-6">
+                      <ShareButton />
+                      <GitHubButton />
+                      <SubscribeButton />
                     </div>
                   </CardContent>
                 </Card>
@@ -960,7 +1141,7 @@ interface VersionProps {
 }
 
 function VersionCard({ version, isLatest }: VersionProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(isLatest);
   
   const toggleExpand = useCallback(() => {
     setExpanded(!expanded);
@@ -973,23 +1154,23 @@ function VersionCard({ version, isLatest }: VersionProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
-      <Card className="border border-border/30 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-        <CardHeader className="bg-primary/5 pb-3 border-b border-border/30">
+      <Card className={`border ${isLatest ? 'border-primary/30' : 'border-border/30'} overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300`}>
+        <CardHeader className={`${isLatest ? 'bg-primary/10' : 'bg-primary/5'} pb-3 border-b border-border/30`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-none">
+              <Badge className={`${isLatest ? 'bg-primary/20 text-primary hover:bg-primary/30' : 'bg-primary/10 text-primary hover:bg-primary/20'} border-none`}>
                 v{version.version}
               </Badge>
               <h2 className="text-xl font-bold">{version.title}</h2>
-            </div>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Clock className="h-3.5 w-3.5 mr-1" />
-              {version.releaseDate}
               {isLatest && (
                 <Badge className="ml-2 bg-accent/20 text-accent hover:bg-accent/30 border-none">
                   Latest
                 </Badge>
               )}
+            </div>
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Clock className="h-3.5 w-3.5 mr-1" />
+              {version.releaseDate}
             </div>
           </div>
         </CardHeader>
@@ -998,20 +1179,41 @@ function VersionCard({ version, isLatest }: VersionProps) {
           
           <div className="space-y-5">
             {version.changes.map((change, index) => (
-              <div key={index} className="space-y-2">
+              <div key={index} className={`space-y-2 ${!expanded && index > 1 ? 'hidden' : ''}`}>
                 <h3 className="flex items-center text-lg font-semibold mb-2">
-                  <span className="flex items-center justify-center w-6 h-6 bg-primary/20 rounded-full mr-2">
+                  <span className={`flex items-center justify-center w-6 h-6 ${
+                    change.type === 'feature' ? 'bg-primary/20' :
+                    change.type === 'ui' ? 'bg-purple-500/20' :
+                    change.type === 'code' ? 'bg-blue-500/20' :
+                    change.type === 'performance' ? 'bg-orange-500/20' :
+                    change.type === 'bugfix' ? 'bg-red-500/20' :
+                    change.type === 'security' ? 'bg-green-500/20' :
+                    'bg-secondary/20'
+                  } rounded-full mr-2`}>
                     {change.icon}
                   </span>
                   <span className="capitalize">{change.type} Changes</span>
                 </h3>
                 <ul className="space-y-1.5 ml-8">
-                  {change.items.map((item, itemIndex) => (
+                  {(expanded ? change.items : change.items.slice(0, 3)).map((item, itemIndex) => (
                     <li key={itemIndex} className="flex items-start">
-                      <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 mr-2 block"></span>
+                      <span className={`w-1.5 h-1.5 ${
+                        change.type === 'feature' ? 'bg-primary' :
+                        change.type === 'ui' ? 'bg-purple-500' :
+                        change.type === 'code' ? 'bg-blue-500' :
+                        change.type === 'performance' ? 'bg-orange-500' :
+                        change.type === 'bugfix' ? 'bg-red-500' :
+                        change.type === 'security' ? 'bg-green-500' :
+                        'bg-secondary'
+                      } rounded-full mt-2 mr-2 block`}></span>
                       <span className="text-sm text-muted-foreground">{item}</span>
                     </li>
                   ))}
+                  {!expanded && change.items.length > 3 && (
+                    <li className="flex items-start">
+                      <span className="text-sm text-primary italic">and {change.items.length - 3} more...</span>
+                    </li>
+                  )}
                 </ul>
               </div>
             ))}
@@ -1023,7 +1225,11 @@ function VersionCard({ version, isLatest }: VersionProps) {
             className="mt-4 text-primary"
             onClick={toggleExpand}
           >
-            <span className="text-sm">{expanded ? "Show Less" : "Show More"}</span>
+            {expanded ? (
+              <><ChevronUp className="h-4 w-4 mr-1" /> <span className="text-sm">Show Less</span></>
+            ) : (
+              <><ChevronDown className="h-4 w-4 mr-1" /> <span className="text-sm">Show More</span></>
+            )}
           </Button>
         </CardContent>
       </Card>
