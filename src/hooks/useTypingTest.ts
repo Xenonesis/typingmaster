@@ -149,7 +149,7 @@ export function useTypingTest() {
   });
   
   // Define endTest at the beginning to avoid reference issues
-  const endTest = useCallback(() => {
+  const endTest = useCallback(async () => {
     if (!isRunning) return;
     
     // Immediately stop the test
@@ -229,17 +229,24 @@ export function useTypingTest() {
                   // Save to pending sync queue
                   queueTestResultForSync(newResults, user.id);
                 } else {
-                  // Try to save directly to server
-                  const { saveTypingStats } = await import("@/services/userService");
-                  await saveTypingStats({
-                    user_id: user.id,
-                    date: new Date(newResults.date).toISOString(),
-                    wpm: newResults.wpm,
-                    accuracy: newResults.accuracy / 100,
-                    test_type: newResults.difficulty,
-                    duration: newResults.time,
-                    raw_wpm: newResults.cpm / 5,
-                    errors: Math.round(newResults.cpm * (1 - newResults.accuracy / 100))
+                  // Try to save directly to server - Fix async/await issue
+                  const saveToServer = async () => {
+                    const { saveTypingStats } = await import("@/services/userService");
+                    await saveTypingStats({
+                      user_id: user.id,
+                      date: new Date(newResults.date).toISOString(),
+                      wpm: newResults.wpm,
+                      accuracy: newResults.accuracy / 100,
+                      test_type: newResults.difficulty,
+                      duration: newResults.time,
+                      raw_wpm: newResults.cpm / 5,
+                      errors: Math.round(newResults.cpm * (1 - newResults.accuracy / 100))
+                    });
+                  };
+                  
+                  saveToServer().catch(err => {
+                    console.error("Error saving to server, queuing for later sync:", err);
+                    queueTestResultForSync(newResults, user.id);
                   });
                 }
               } catch (err) {
