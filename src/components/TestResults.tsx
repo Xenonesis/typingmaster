@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { Progress } from "./ui/progress";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/date";
+import { useAuth } from "@/context/AuthContext";
+import { saveTypingStats } from "@/services/userService";
 
 export interface TestResultsData {
   wpm: number;
@@ -26,11 +28,14 @@ interface TestResultsProps {
 }
 
 export function TestResults({ results, onRestart, isFullscreen, onExitFullscreen }: TestResultsProps) {
+  const { user } = useAuth();
   const [isCopied, setIsCopied] = useState(false);
   const [showScoreAnimation, setShowScoreAnimation] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
   const [personalBest, setPersonalBest] = useState<number | null>(null);
   const [isNewPersonalBest, setIsNewPersonalBest] = useState(false);
+  const [isSavingToCloud, setIsSavingToCloud] = useState(false);
+  const [savedToCloud, setSavedToCloud] = useState(false);
 
   useEffect(() => {
     if (results) {
@@ -67,9 +72,52 @@ export function TestResults({ results, onRestart, isFullscreen, onExitFullscreen
         }
         
         setShowScoreAnimation(true);
+        
+        // Save results to Supabase if user is logged in
+        saveResultsToDatabase();
       }, 500);
     }
   }, [results]);
+
+  // Save results to Supabase if user is logged in
+  const saveResultsToDatabase = async () => {
+    if (!user || !results) return;
+    
+    try {
+      setIsSavingToCloud(true);
+      
+      // Save the typing stats - the database trigger will automatically update the profile
+      const savedStats = await saveTypingStats({
+        user_id: user.id,
+        date: new Date(results.date).toISOString(),
+        wpm: results.wpm,
+        accuracy: results.accuracy / 100,
+        test_type: results.difficulty,
+        duration: results.time,
+        raw_wpm: results.cpm / 5,
+        errors: Math.round(results.cpm * (1 - results.accuracy / 100)),
+      });
+      
+      setSavedToCloud(true);
+      
+      toast({
+        title: "Results saved",
+        description: "Your test results have been saved to your profile.",
+      });
+      
+      return savedStats;
+    } catch (error) {
+      console.error("Error saving results to database:", error);
+      toast({
+        title: "Error saving results",
+        description: "There was a problem saving your results. Please try again later.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setIsSavingToCloud(false);
+    }
+  };
 
   // Calculate a score based on WPM, accuracy, and difficulty
   function calculateScore(result: TestResultsData): number {

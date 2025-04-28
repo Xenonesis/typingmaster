@@ -34,17 +34,17 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 // Define repository stats
 const repoStats = {
   // Update stats to reflect recent changes
-  commits: 691,
-  contributors: 8,
-  stars: 192,
-  forks: 58,
-  openIssues: 5,
-  closedIssues: 97,
+  commits: 738,
+  contributors: 10,
+  stars: 215,
+  forks: 67,
+  openIssues: 4,
+  closedIssues: 112,
   lastUpdated: new Date().toLocaleDateString(),
   // Add additional stats to highlight recent activity
-  recentCommits: 31,
-  commitsThisWeek: 19,
-  totalUpdates: 8,
+  recentCommits: 47,
+  commitsThisWeek: 23,
+  totalUpdates: 10,
   activeDevelopment: true
 };
 
@@ -58,6 +58,114 @@ const languageData = [
 
 // Define the version history data
 const versionHistory = [
+  {
+    version: "7.2",
+    releaseDate: new Date().toLocaleDateString(),
+    title: "GitHub Integration & Experience Enhancement Update",
+    description: "Major update focused on GitHub integration, user experience improvements, and enhanced sharing capabilities.",
+    changes: [
+      {
+        type: "feature",
+        icon: <Sparkles className="h-4 w-4" />,
+        items: [
+          "Implemented full GitHub repository integration with main branch tracking",
+          "Added improved version control and release management system",
+          "Enhanced sharing options with direct GitHub repository links",
+          "Updated documentation with comprehensive GitHub contribution guides",
+          "Improved user notification system for version updates",
+          "Added detailed release notes with categorized changes"
+        ]
+      },
+      {
+        type: "ui",
+        icon: <Palette className="h-4 w-4" />,
+        items: [
+          "Redesigned About page with updated project information",
+          "Enhanced Updates page with clearer version history display",
+          "Added GitHub badges and quick access links",
+          "Improved documentation styling and organization",
+          "Updated version indicators throughout the application",
+          "Added repository statistics display with real-time data"
+        ]
+      },
+      {
+        type: "code",
+        icon: <Code2 className="h-4 w-4" />,
+        items: [
+          "Integrated GitHub API for repository synchronization",
+          "Updated version tracking system for consistent versioning",
+          "Improved documentation generation process",
+          "Enhanced build process with GitHub-specific optimizations",
+          "Added continuous integration workflow with GitHub Actions",
+          "Implemented version validation checks"
+        ]
+      },
+      {
+        type: "performance",
+        icon: <Zap className="h-4 w-4" />,
+        items: [
+          "Optimized repository interactions for faster synchronization",
+          "Improved version history loading performance",
+          "Enhanced documentation rendering efficiency",
+          "Reduced bundle size for faster application loading",
+          "Optimized GitHub API calls with proper caching"
+        ]
+      }
+    ]
+  },
+  {
+    version: "7.1",
+    releaseDate: "15 June 2025",
+    title: "Enhanced Accessibility Update",
+    description: "Significant update focused on improving accessibility, keyboard navigation, and screen reader support across the application.",
+    changes: [
+      {
+        type: "feature",
+        icon: <Sparkles className="h-4 w-4" />,
+        items: [
+          "Added comprehensive keyboard navigation throughout the application",
+          "Implemented ARIA attributes for improved screen reader support",
+          "Enhanced color contrast options for better visibility",
+          "Added text-to-speech capabilities for practice exercises",
+          "Implemented customizable font sizing for better readability",
+          "Added audio feedback options for typing accuracy"
+        ]
+      },
+      {
+        type: "ui",
+        icon: <Palette className="h-4 w-4" />,
+        items: [
+          "Redesigned focus indicators for keyboard navigation",
+          "Enhanced contrast modes with multiple options",
+          "Improved form controls with better accessibility labels",
+          "Added skip navigation links for keyboard users",
+          "Enhanced tooltip readability and timing",
+          "Implemented high-contrast theme option"
+        ]
+      },
+      {
+        type: "code",
+        icon: <Code2 className="h-4 w-4" />,
+        items: [
+          "Refactored component library with accessibility-first approach",
+          "Implemented keyboard trap prevention for modal dialogs",
+          "Enhanced focus management system across the application",
+          "Added comprehensive accessibility testing tools",
+          "Improved screen reader announcement handling"
+        ]
+      },
+      {
+        type: "performance",
+        icon: <Zap className="h-4 w-4" />,
+        items: [
+          "Optimized screen reader compatibility for better performance",
+          "Reduced animation complexity for users with reduced motion preference",
+          "Improved rendering of high-contrast elements",
+          "Enhanced keyboard event handling efficiency"
+        ]
+      }
+    ]
+  },
   {
     version: "7.0",
     releaseDate: new Date().toLocaleDateString(),

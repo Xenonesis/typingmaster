@@ -54,7 +54,10 @@ import {
   Flame,
   Clock,
   Hexagon,
-  BarChart3
+  BarChart3,
+  Database,
+  FileCode,
+  LayoutGrid
 } from "lucide-react";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { motion } from "framer-motion";
@@ -164,33 +167,33 @@ export default function About() {
             </DialogHeader>
             
             <div className="py-4">
-              <h3 className="font-semibold text-primary mb-2">Latest Updates:</h3>
+              <h3 className="font-semibold text-primary mb-2">Latest Updates in v7.2:</h3>
               <ul className="space-y-2 text-sm">
                 <li className="flex items-start">
                   <span className="text-primary mr-2 font-bold">•</span>
-                  <span>New multiplayer typing race mode with live competition</span>
+                  <span>Full GitHub integration with main branch tracking</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-primary mr-2 font-bold">•</span>
-                  <span>Expanded text library with programming and technical content</span>
+                  <span>Enhanced version control and release management</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-primary mr-2 font-bold">•</span>
-                  <span>Improved analytics dashboard with progress tracking</span>
+                  <span>Improved documentation and contribution guides</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-primary mr-2 font-bold">•</span>
-                  <span>Dark mode and customizable UI themes</span>
+                  <span>Repository statistics with real-time data</span>
                 </li>
               </ul>
               
               <Separator className="my-4" />
               
               <div className="bg-accent/10 p-3 rounded-md border border-accent/20 text-sm">
-                <p className="mb-2 text-center font-medium">Your feedback helps us improve!</p>
+                <p className="mb-2 text-center font-medium">Contribute to our project on GitHub!</p>
                 <p className="text-muted-foreground">
-                  We're constantly working to make TypeSpeed Master better. 
-                  Please share your thoughts and suggestions through our feedback form.
+                  We're now on GitHub! Visit our repository at github.com/Xenonesis/speed-typist-challenge to contribute, 
+                  report issues, or submit feature requests.
                 </p>
               </div>
             </div>
@@ -293,7 +296,42 @@ export default function About() {
           </DialogContent>
         </Dialog>
         
-        <main className="flex-grow flex flex-col p-4 sm:p-6 pt-20 pb-20">
+        {/* New Hero Section */}
+        <section className="relative overflow-hidden py-20 bg-gradient-to-b from-primary/5 to-background">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+          <div className="container mx-auto px-4 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="max-w-3xl mx-auto text-center"
+            >
+              <Badge variant="outline" className="mb-4 px-3 py-1 bg-primary/10 text-primary border-primary/20">
+                Elevate Your Typing Skills
+              </Badge>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+                About TypeSpeed Master
+              </h1>
+              <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                Your journey to faster, more accurate typing starts here. 
+                Discover our mission, features, and the technology that powers TypeSpeed Master.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <Button size="lg" className="rounded-full gap-2">
+                  <Keyboard className="h-4 w-4" />
+                  Start Practicing
+                </Button>
+                <Button size="lg" variant="outline" className="rounded-full gap-2">
+                  <Users className="h-4 w-4" />
+                  Join Community
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+          <div className="absolute -bottom-10 left-0 right-0 h-20 bg-gradient-to-t from-background to-transparent"></div>
+        </section>
+        
+        <main className="flex-1 py-10">
           <div className="container max-w-4xl mx-auto">
             <motion.div 
               className="flex items-center space-x-3 mb-8"
@@ -557,7 +595,15 @@ export default function About() {
                         <ul className="space-y-2 text-muted-foreground leading-relaxed">
                           <li className="flex items-start">
                             <span className="text-accent mr-2">•</span>
-                            <span>React with TypeScript for robust, type-safe code</span>
+                            <span>Next.js 15.3 with App Router for powerful React framework</span>
+                          </li>
+                          <li className="flex items-start">
+                            <span className="text-accent mr-2">•</span>
+                            <span>TypeScript for robust, type-safe code</span>
+                          </li>
+                          <li className="flex items-start">
+                            <span className="text-accent mr-2">•</span>
+                            <span>Supabase for database, authentication, and storage</span>
                           </li>
                           <li className="flex items-start">
                             <span className="text-accent mr-2">•</span>
@@ -570,14 +616,6 @@ export default function About() {
                           <li className="flex items-start">
                             <span className="text-accent mr-2">•</span>
                             <span>Framer Motion for smooth animations and transitions</span>
-                          </li>
-                          <li className="flex items-start">
-                            <span className="text-accent mr-2">•</span>
-                            <span>Recharts for interactive data visualization</span>
-                          </li>
-                          <li className="flex items-start">
-                            <span className="text-accent mr-2">•</span>
-                            <span>Modern API integration for AI-powered features</span>
                           </li>
                         </ul>
                       </div>
@@ -601,38 +639,49 @@ export default function About() {
                     Tech Stack
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-4">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {/* React */}
+                <CardContent className="pt-6">
+                  <div className="mb-6 text-center">
+                    <h3 className="text-lg font-medium text-primary/90 mb-2">Powered by Modern Technologies</h3>
+                    <p className="text-muted-foreground max-w-2xl mx-auto">
+                      TypeSpeed Master is built with cutting-edge technologies to provide a seamless, responsive, and feature-rich typing experience.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-6">
+                    {/* Next.js */}
                     <motion.div 
                       whileHover={{ scale: 1.05 }} 
-                      className="bg-gradient-to-br from-blue-50/50 to-cyan-50/50 dark:from-blue-950/30 dark:to-cyan-950/30 p-4 rounded-xl border border-blue-200/30 dark:border-blue-800/30 flex flex-col items-center"
+                      className="bg-gradient-to-br from-slate-50/50 to-zinc-50/50 dark:from-slate-950/30 dark:to-zinc-950/30 p-4 rounded-xl border border-slate-200/30 dark:border-slate-800/30 flex flex-col items-center"
                     >
                       <motion.div 
                         animate={{ rotate: [0, 360] }}
                         transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
                         className="mb-3"
                       >
-                        {/* Fallback icon if image fails */}
-                        <div className="relative">
-                          <img 
-                            src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" 
-                            alt="React" 
-                            className="h-10 w-10 text-blue-500" 
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                              e.currentTarget.nextElementSibling.style.display = 'block';
-                            }}
-                          />
-                          <div className="hidden">
-                            <div className="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center">
-                              <div className="text-blue-500 font-bold">R</div>
-                            </div>
-                          </div>
+                        <div className="h-10 w-10 text-black dark:text-white">
+                          <svg viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-10 w-10">
+                            <mask id="mask0_408_134" style={{maskType: "alpha"}} maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180">
+                              <circle cx="90" cy="90" r="90" fill="black"/>
+                            </mask>
+                            <g mask="url(#mask0_408_134)">
+                              <circle cx="90" cy="90" r="90" fill="currentColor"/>
+                              <path d="M149.508 157.52L69.142 54H54V125.97H66.1136V69.3836L139.999 164.845C143.333 162.614 146.509 160.165 149.508 157.52Z" fill="url(#paint0_linear_408_134)"/>
+                              <rect x="115" y="54" width="12" height="72" fill="url(#paint1_linear_408_134)"/>
+                            </g>
+                            <defs>
+                              <linearGradient id="paint0_linear_408_134" x1="109" y1="116.5" x2="144.5" y2="160.5" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="white"/>
+                                <stop offset="1" stopColor="white" stopOpacity="0"/>
+                              </linearGradient>
+                              <linearGradient id="paint1_linear_408_134" x1="121" y1="54" x2="120.799" y2="106.875" gradientUnits="userSpaceOnUse">
+                                <stop stopColor="white"/>
+                                <stop offset="1" stopColor="white" stopOpacity="0"/>
+                              </linearGradient>
+                            </defs>
+                          </svg>
                         </div>
                       </motion.div>
-                      <span className="font-medium text-sm">React</span>
-                      <span className="text-xs text-muted-foreground">UI library</span>
+                      <span className="font-medium text-sm">Next.js 15.3</span>
+                      <span className="text-xs text-muted-foreground">React Framework</span>
                     </motion.div>
 
                     {/* TypeScript */}
@@ -645,31 +694,16 @@ export default function About() {
                         whileTap={{ scale: 0.9 }}
                         className="mb-3"
                       >
-                        <div className="relative">
-                          <img 
-                            src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg" 
-                            alt="TypeScript" 
-                            className="h-10 w-10" 
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                              e.currentTarget.nextElementSibling.style.display = 'block';
-                            }}
-                          />
-                          <div className="hidden">
-                            <div className="h-10 w-10 rounded-md bg-blue-600 flex items-center justify-center">
-                              <div className="text-white font-bold">TS</div>
-                            </div>
-                          </div>
-                        </div>
+                        <FileCode className="h-10 w-10 text-blue-600" />
                       </motion.div>
                       <span className="font-medium text-sm">TypeScript</span>
                       <span className="text-xs text-muted-foreground">Type-safe JS</span>
                     </motion.div>
 
-                    {/* Vite */}
+                    {/* Supabase */}
                     <motion.div 
                       whileHover={{ scale: 1.05 }} 
-                      className="bg-gradient-to-br from-purple-50/50 to-violet-50/50 dark:from-purple-950/30 dark:to-violet-950/30 p-4 rounded-xl border border-purple-200/30 dark:border-purple-800/30 flex flex-col items-center"
+                      className="bg-gradient-to-br from-emerald-50/50 to-green-50/50 dark:from-emerald-950/30 dark:to-green-950/30 p-4 rounded-xl border border-emerald-200/30 dark:border-emerald-800/30 flex flex-col items-center"
                     >
                       <motion.div 
                         whileHover={{ 
@@ -684,27 +718,12 @@ export default function About() {
                             scale: [1, 1.1, 1]
                           }}
                           transition={{ duration: 2, repeat: Infinity }}
-                          className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-yellow-500/20 rounded-full filter blur-md"
+                          className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-green-500/20 rounded-full filter blur-md"
                         />
-                        <div className="relative z-10">
-                          <img 
-                            src="https://vitejs.dev/logo.svg" 
-                            alt="Vite" 
-                            className="h-10 w-10" 
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                              e.currentTarget.nextElementSibling.style.display = 'block';
-                            }}
-                          />
-                          <div className="hidden">
-                            <div className="h-10 w-10 flex items-center justify-center">
-                              <Zap className="h-8 w-8 text-purple-500" />
-                            </div>
-                          </div>
-                        </div>
+                        <Database className="h-10 w-10 text-emerald-500 relative z-10" />
                       </motion.div>
-                      <span className="font-medium text-sm">Vite</span>
-                      <span className="text-xs text-muted-foreground">Build tool</span>
+                      <span className="font-medium text-sm">Supabase</span>
+                      <span className="text-xs text-muted-foreground">Backend & Database</span>
                     </motion.div>
 
                     {/* Tailwind CSS */}
@@ -719,22 +738,7 @@ export default function About() {
                         }}
                         className="mb-3 rounded-lg"
                       >
-                        <div className="relative">
-                          <img 
-                            src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg" 
-                            alt="Tailwind CSS" 
-                            className="h-10 w-10" 
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                              e.currentTarget.nextElementSibling.style.display = 'block';
-                            }}
-                          />
-                          <div className="hidden">
-                            <div className="h-10 w-10 rounded-md bg-sky-500 flex items-center justify-center">
-                              <div className="text-white font-bold">TW</div>
-                            </div>
-                          </div>
-                        </div>
+                        <LayoutGrid className="h-10 w-10 text-sky-500" />
                       </motion.div>
                       <span className="font-medium text-sm">Tailwind CSS</span>
                       <span className="text-xs text-muted-foreground">Utility-first CSS</span>
@@ -780,17 +784,7 @@ export default function About() {
                           }}
                           transition={{ duration: 2, repeat: Infinity }}
                         >
-                          <div className="relative">
-                            <svg className="h-10 w-10" viewBox="0 0 14 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M0 0V21H14V0H0Z" fill="#0055FF"/>
-                              <path fillRule="evenodd" clipRule="evenodd" d="M7.30827 5.80566H11.3301V9.02193H7.30827V5.80566ZM3.26877 13.4332H7.30827V9.02193H3.26877V13.4332ZM3.26877 5.80566V9.02193L0 9.02193V5.80566H3.26877Z" fill="white"/>
-                            </svg>
-                            <div className="hidden">
-                              <div className="h-10 w-10 rounded-md bg-pink-500 flex items-center justify-center">
-                                <div className="text-white font-bold">FM</div>
-                              </div>
-                            </div>
-                          </div>
+                          <Sparkles className="h-10 w-10 text-pink-500" />
                         </motion.div>
                       </motion.div>
                       <span className="font-medium text-sm">Framer Motion</span>
@@ -815,17 +809,7 @@ export default function About() {
                           }}
                           transition={{ duration: 3, repeat: Infinity }}
                         >
-                          <div className="relative">
-                            <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#40C9A2"/>
-                              <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="#40C9A2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                            <div className="hidden">
-                              <div className="h-10 w-10 flex items-center justify-center">
-                                <BarChart3 className="h-8 w-8 text-emerald-500" />
-                              </div>
-                            </div>
-                          </div>
+                          <BarChart3 className="h-10 w-10 text-emerald-500" />
                         </motion.div>
                       </motion.div>
                       <span className="font-medium text-sm">Recharts</span>
@@ -850,14 +834,24 @@ export default function About() {
                           }}
                           transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                         >
-                          <div className="relative">
-                            <Cpu className="h-10 w-10 text-orange-500" />
-                          </div>
+                          <Cpu className="h-10 w-10 text-orange-500" />
                         </motion.div>
                       </motion.div>
                       <span className="font-medium text-sm">Lucide React</span>
                       <span className="text-xs text-muted-foreground">Icon library</span>
                     </motion.div>
+                  </div>
+                  <div className="mt-8 p-4 bg-accent/5 rounded-lg border border-accent/10">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="flex items-center gap-2">
+                        <Info className="h-5 w-5 text-accent" />
+                        <p className="text-sm text-muted-foreground">Our tech stack is constantly evolving to incorporate the latest tools and best practices.</p>
+                      </div>
+                      <Button variant="outline" size="sm" className="shrink-0 gap-1">
+                        <Github className="h-4 w-4" />
+                        View Source Code
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -1073,58 +1067,68 @@ export default function About() {
                 </CardContent>
               )}
             </Card>
-          </div>
-          
-          {/* Feedback and Contribute Section */}
-          <motion.div 
-            className="container max-w-4xl mx-auto mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-          >
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold gradient-heading">Join Our Community</h2>
-              <p className="text-muted-foreground mt-2">We welcome your feedback and contributions</p>
-            </div>
-            
-            <div className="flex flex-col md:flex-row gap-6 justify-center mb-8">
-              <Button 
-                size="lg" 
-                className="bg-primary hover:bg-primary/90 text-white"
-                onClick={() => document.getElementById('feedback-form')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                <Heart className="h-4 w-4 mr-2" />
-                Provide Feedback
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="border-primary text-primary hover:bg-primary/10"
-                onClick={() => window.open("https://github.com/Xenonesis/speed-typist-challenge", "_blank")}
-              >
-                <Github className="h-4 w-4 mr-2" />
-                Contribute on GitHub
-              </Button>
-            </div>
-            
-            <div id="feedback-form" className="bg-card border border-border/30 rounded-lg p-6 shadow-sm">
-              <h3 className="text-xl font-semibold mb-4 text-center">Your Feedback Matters</h3>
-              <div className="flex justify-center">
-                <iframe 
-                  src="https://docs.google.com/forms/d/e/1FAIpQLSccSvSOjT1YHODo7HauelLIf0L2s7ZRxjKKB16qirJ1AjAy7w/viewform?embedded=true" 
-                  width="100%" 
-                  height="1286" 
-                  style={{ border: 'none' }}
-                  title="Feedback Form"
-                >
-                  Loading…
-                </iframe>
+
+            {/* Add Call-to-Action section before Footer */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.65 }}
+              className="mt-12 mb-16"
+            >
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-primary/80 p-8 md:p-10">
+                <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4">
+                  <div className="h-48 w-48 rounded-full bg-primary-foreground/10 blur-3xl"></div>
+                </div>
+                <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4">
+                  <div className="h-48 w-48 rounded-full bg-primary-foreground/10 blur-3xl"></div>
+                </div>
+                <div className="relative max-w-3xl mx-auto text-center text-primary-foreground">
+                  <h2 className="text-3xl font-bold mb-4">Ready to Elevate Your Typing Skills?</h2>
+                  <p className="text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
+                    Join thousands of users who are improving their typing speed and accuracy with TypeSpeed Master. Start your journey today!
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button size="lg" variant="secondary" className="gap-2">
+                      <Keyboard className="h-4 w-4" />
+                      Start Practicing
+                    </Button>
+                    <Button size="lg" variant="outline" className="bg-transparent text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/10 gap-2">
+                      <Eye className="h-4 w-4" />
+                      See Your Progress
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </main>
-        
+
         <Footer />
+        
+        {/* Quick Navigation Floating Button */}
+        <motion.div 
+          className="fixed bottom-6 right-6 z-50"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1 }}
+        >
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  className="h-12 w-12 rounded-full shadow-lg"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                >
+                  <ChevronUp className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                Back to top
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </motion.div>
       </div>
     </ThemeProvider>
   );

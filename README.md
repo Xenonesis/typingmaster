@@ -5,7 +5,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind-3.4.11-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 [![shadcn/ui](https://img.shields.io/badge/shadcn/ui-Latest-000000?style=flat-square)](https://ui.shadcn.com/)
 [![Netlify](https://img.shields.io/badge/Netlify-Deployed-00C7B7?style=flat-square&logo=netlify)](https://typespeedmaster.netlify.app/#/)
-[![Version](https://img.shields.io/badge/Version-6.1-blue?style=flat-square)](https://typespeedmaster.netlify.app/#/updates)
+[![Version](https://img.shields.io/badge/Version-7.2-blue?style=flat-square)](https://typespeedmaster.netlify.app/#/updates)
 [![Mobile-Ready](https://img.shields.io/badge/Mobile-Ready-green?style=flat-square&logo=android)](https://typespeedmaster.netlify.app/#/)
 
 ## 📝 About the Project
@@ -93,7 +93,7 @@ Our latest major update brings significant improvements to the multiplayer exper
 ## 🔧 Installation & Setup
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Xenonesis/speed-typist-challenge
+   git clone https://github.com/Xenonesis/speed-typist-challenge.git
    cd speed-typist-challenge
    ```
 

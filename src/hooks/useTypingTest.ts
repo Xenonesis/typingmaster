@@ -4,6 +4,7 @@ import { toast } from "@/hooks/use-toast";
 import { TestResultsData } from "@/components/TestResults";
 import { useAchievements } from "@/context/AchievementsContext";
 import { useTypingStats } from "@/context/TypingStatsContext";
+import { useAuth } from "@/context/AuthContext";
 
 // Create a simple debounce function
 const debounce = <F extends (...args: any[]) => any>(
@@ -108,6 +109,7 @@ export function useTypingTest() {
   const [isLoading, setIsLoading] = useState(false);
   const { updateProgress } = useAchievements();
   const { refreshStats, trackError } = useTypingStats();
+  const { user } = useAuth();
   
   const textContainerRef = useRef<HTMLDivElement>(null);
   const textInputRef = useRef<HTMLInputElement>(null);
@@ -220,8 +222,33 @@ export function useTypingTest() {
             
             localStorage.setItem("typingPersonalBests", JSON.stringify(updatedResults));
             
+            // Queue for server sync if offline or if saving to server fails
+            if (user && user.id) {
+              try {
+                if (!navigator.onLine) {
+                  // Save to pending sync queue
+                  queueTestResultForSync(newResults, user.id);
+                } else {
+                  // Try to save directly to server
+                  const { saveTypingStats } = await import("@/services/userService");
+                  await saveTypingStats({
+                    user_id: user.id,
+                    date: new Date(newResults.date).toISOString(),
+                    wpm: newResults.wpm,
+                    accuracy: newResults.accuracy / 100,
+                    test_type: newResults.difficulty,
+                    duration: newResults.time,
+                    raw_wpm: newResults.cpm / 5,
+                    errors: Math.round(newResults.cpm * (1 - newResults.accuracy / 100))
+                  });
+                }
+              } catch (err) {
+                console.error("Error saving to server, queuing for later sync:", err);
+                queueTestResultForSync(newResults, user.id);
+              }
+            }
+            
             // Update achievements only if we have valid results
-            // Update test completion achievements
             updateProgress('tests_completed_10', updatedResults.length);
             updateProgress('tests_completed_50', updatedResults.length);
             updateProgress('tests_completed_100', updatedResults.length);
@@ -729,6 +756,29 @@ export function useTypingTest() {
       }
     };
   }, [isRunning, isPaused]);
+
+  // Helper function to queue a test result for later syncing
+  const queueTestResultForSync = (result: TestResultsData, userId: string) => {
+    try {
+      const pendingSyncJSON = localStorage.getItem("typingPendingSync");
+      const pendingSync: TestResultsData[] = pendingSyncJSON 
+        ? JSON.parse(pendingSyncJSON) 
+        : [];
+      
+      // Add user ID to the result for later identification
+      const resultWithUser = {
+        ...result,
+        userId
+      };
+      
+      pendingSync.push(resultWithUser);
+      localStorage.setItem("typingPendingSync", JSON.stringify(pendingSync));
+      
+      console.log("Test result queued for later sync");
+    } catch (error) {
+      console.error("Error queuing test result for sync:", error);
+    }
+  };
 
   return {
     text,

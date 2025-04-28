@@ -40,6 +40,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
+import { UserButton } from "@/components/auth/UserButton";
 
 // Add CSS for text shadow if not already in your global CSS
 const textShadowStyle = `
@@ -295,42 +296,17 @@ export function Header() {
             </div>
           </nav>
 
-          {/* Mobile Menu Button */}
-          <div className="flex md:hidden items-center space-x-2">
-            <ThemeToggle />
-            <motion.div whileTap={{ scale: 0.9 }}>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="h-9 w-9 rounded-full bg-background/30 backdrop-blur-md border border-border/20"
-                aria-label="Toggle menu"
-              >
-                <AnimatePresence mode="wait">
-                  {mobileMenuOpen ? (
-                    <motion.div
-                      key="close"
-                      initial={{ rotate: -90, opacity: 0 }}
-                      animate={{ rotate: 0, opacity: 1 }}
-                      exit={{ rotate: 90, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <X className="h-5 w-5" />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="menu"
-                      initial={{ rotate: 90, opacity: 0 }}
-                      animate={{ rotate: 0, opacity: 1 }}
-                      exit={{ rotate: -90, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Menu className="h-5 w-5" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </Button>
-            </motion.div>
+          <div className="flex items-center gap-2">
+            <UserButton />
+            {/* Mobile menu button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
           </div>
         </div>
       </div>
@@ -346,6 +322,9 @@ export function Header() {
             transition={{ duration: 0.2 }}
           >
             <nav className="container py-3 pb-4 space-y-1 bg-background/30 backdrop-blur-lg rounded-b-xl shadow-sm border-x border-b border-border/20">
+              <div className="flex justify-end px-4 py-1">
+                <ThemeToggle />
+              </div>
               <MobileNavLink to="/" active={location.pathname === "/"} icon={<Home className="h-5 w-5" />}>
                 Home
               </MobileNavLink>

@@ -7,6 +7,7 @@ import { lazy, Suspense } from "react";
 import { AchievementsProvider } from "./context/AchievementsContext";
 import { AnimationsProvider } from "./context/AnimationsContext";
 import { TypingStatsProvider } from "./context/TypingStatsContext";
+import { AuthProvider } from "./context/AuthContext";
 import { useState, useEffect } from "react";
 
 // Lazy load components for code splitting
@@ -22,6 +23,11 @@ const TypingTest = lazy(() => import("./pages/TypingTest"));
 const TypingPractice = lazy(() => import("./pages/TypingPractice"));
 const Multiplayer = lazy(() => import("./pages/Multiplayer"));
 const AIChallenge = lazy(() => import("./pages/AIChallenge"));
+
+// Auth pages
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 
 // Loading component for suspense fallback
 const Loading = () => (
@@ -57,6 +63,12 @@ const AppRoutes = () => (
       <Route path="/about" element={<About />} />
       <Route path="/multiplayer" element={<Multiplayer />} />
       <Route path="/ai-challenge" element={<AIChallenge />} />
+      
+      {/* Auth routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      
       <Route path="*" element={<NotFound />} />
     </Routes>
   </Suspense>
@@ -77,17 +89,19 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AchievementsProvider>
-          <AnimationsProvider>
-            <TypingStatsProvider>
-              <Toaster />
-              <Sonner />
-              <HashRouter>
-                <AppRoutes />
-              </HashRouter>
-            </TypingStatsProvider>
-          </AnimationsProvider>
-        </AchievementsProvider>
+        <AuthProvider>
+          <AchievementsProvider>
+            <AnimationsProvider>
+              <TypingStatsProvider>
+                <Toaster />
+                <Sonner />
+                <HashRouter>
+                  <AppRoutes />
+                </HashRouter>
+              </TypingStatsProvider>
+            </AnimationsProvider>
+          </AchievementsProvider>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

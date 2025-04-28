@@ -16,6 +16,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { TypingHeatmap } from "@/components/TypingHeatmap";
+import { useAuth } from "@/context/AuthContext";
 
 // Define interface for frequent mistakes
 interface MistakeData {
@@ -129,6 +130,10 @@ export default function Stats() {
     lastTestDate: 0
   });
   const [detailedPerformance, setDetailedPerformance] = useState<DetailedPerformanceData[]>([]);
+
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [pendingSync, setPendingSync] = useState<TestResultsData[]>([]);
+  const { user } = useAuth();
 
   // Color palette for charts
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
@@ -1127,6 +1132,91 @@ export default function Stats() {
       };
     });
   }, [frequentMistakes]);
+
+  // Network status detection and auto-sync
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      syncPendingDataWithServer();
+    };
+    
+    const handleOffline = () => {
+      setIsOnline(false);
+    };
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    // Check if we have any pending syncs on mount
+    const pendingSyncData = localStorage.getItem("typingPendingSync");
+    if (pendingSyncData) {
+      try {
+        const pendingTests = JSON.parse(pendingSyncData);
+        setPendingSync(pendingTests);
+        
+        if (navigator.onLine && user) {
+          syncPendingDataWithServer();
+        }
+      } catch (err) {
+        console.error("Error parsing pending sync data:", err);
+        localStorage.removeItem("typingPendingSync");
+      }
+    }
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [user]);
+  
+  // Function to sync pending data with server
+  const syncPendingDataWithServer = async () => {
+    if (!user || !navigator.onLine || pendingSync.length === 0) return;
+    
+    try {
+      const { saveTypingStats } = await import("@/services/userService");
+      let syncedCount = 0;
+      
+      // Process each pending test in sequence
+      for (const test of pendingSync) {
+        try {
+          await saveTypingStats({
+            user_id: user.id,
+            date: new Date(test.date).toISOString(),
+            wpm: test.wpm,
+            accuracy: test.accuracy / 100,
+            test_type: test.difficulty,
+            duration: test.time,
+            raw_wpm: test.cpm / 5,
+            errors: Math.round(test.cpm * (1 - test.accuracy / 100)),
+          });
+          syncedCount++;
+        } catch (err) {
+          console.error("Failed to sync test result:", err);
+          // Continue with next test
+        }
+      }
+      
+      if (syncedCount > 0) {
+        // Update the pending sync list to remove synced items
+        const remainingTests = pendingSync.slice(syncedCount);
+        setPendingSync(remainingTests);
+        
+        if (remainingTests.length > 0) {
+          localStorage.setItem("typingPendingSync", JSON.stringify(remainingTests));
+        } else {
+          localStorage.removeItem("typingPendingSync");
+        }
+        
+        toast({
+          title: "Data synced",
+          description: `${syncedCount} test results were synchronized with your profile.`,
+        });
+      }
+    } catch (error) {
+      console.error("Error syncing data with server:", error);
+    }
+  };
 
   return (
     <ThemeProvider>
