@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>speed-typist-challenge</title>
+    <meta name="description" content="Improve your typing speed and accuracy with our typing test" />
+    <meta name="author" content="Lovable" />
+
+    <meta property="og:title" content="TypeSpeed Master - Typing Test Challenge" />
+    <meta property="og:description" content="Improve your typing speed and accuracy with our advanced typing test" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@lovable_dev" />
+    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    
+    <!-- Performance optimizations -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.gpteng.co">
+    
+    <!-- Add preload for critical assets -->
+    <link rel="preload" href="/src/index.css" as="style">
+    
+    <!-- Use modern image format -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    
+    <!-- Add inline critical CSS -->
+    <style>
+      /* Add critical path CSS here */
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        opacity: 0;
+        transition: opacity 0.2s ease-in;
+      }
+      #root {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+    </style>
+    <script type="module">
+      // Remove FOUC (Flash of Unstyled Content)
+      document.addEventListener('DOMContentLoaded', () => {
+        document.body.style.opacity = '1';
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Inline performance measurement
+      if (window.performance) {
+        window.addEventListener('load', () => {
+          setTimeout(() => {
+            const timing = window.performance.timing;
+            const pageLoadTime = timing.loadEventEnd - timing.navigationStart;
+            console.info('Page load time:', pageLoadTime + 'ms');
+          }, 0);
+        });
+      }
+    </script>
+  </body>
+</html>

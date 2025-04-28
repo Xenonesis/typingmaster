@@ -1,0 +1,1786 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom responsive utilities */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .shadow-soft {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .gradient-heading {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70;
+  }
+  
+  /* Responsive padding utilities */
+  .p-responsive {
+    @apply p-3 sm:p-4 md:p-6;
+  }
+  
+  .px-responsive {
+    @apply px-3 sm:px-4 md:px-6;
+  }
+  
+  .py-responsive {
+    @apply py-3 sm:py-4 md:py-6;
+  }
+  
+  /* Improved focus mode */
+  .focus-mode {
+    @apply max-w-3xl mx-auto;
+  }
+  
+  /* Fullscreen mode styles */
+  .fullscreen-mode {
+    @apply bg-background;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* Combined fullscreen and focus mode styles for optimal typing experience */
+  .fullscreen-mode.focus-mode {
+    @apply bg-gradient-to-b from-background to-background/95;
+  }
+  
+  .fullscreen-mode.focus-mode .typing-text {
+    @apply shadow-lg border-primary/20 max-w-3xl mx-auto;
+    font-size: 1.25rem;
+    line-height: 1.8;
+    padding: 2rem;
+  }
+  
+  .fullscreen-mode.focus-mode .test-header {
+    @apply mb-6 opacity-60;
+  }
+  
+  .fullscreen-mode.focus-mode .test-controls {
+    @apply bg-background/50 backdrop-blur-md border border-border/30 
+           p-3 rounded-xl shadow-sm transition-all duration-300 
+           mt-6 opacity-60 hover:opacity-100;
+  }
+  
+  .fullscreen-mode.focus-mode .test-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  /* Mobile optimizations for focus mode */
+  @media (max-width: 768px) {
+    .fullscreen-mode.focus-mode .typing-text {
+      font-size: 1.125rem;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .fullscreen-mode.focus-mode .test-header {
+      @apply mb-4;
+    }
+    
+    .fullscreen-mode.focus-mode .test-controls {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 2rem);
+      z-index: 50;
+    }
+  }
+  
+  /* Smooth transitions when entering/exiting fullscreen */
+  @keyframes fade-in-fullscreen {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  
+  .fullscreen-mode.focus-mode .typing-text-container {
+    animation: fade-in-fullscreen 0.3s ease-out forwards;
+  }
+  
+  /* Improved visual feedback for mobile touch */
+  .mobile-typing-test.touch-active .typing-text {
+    @apply border-primary/30 bg-background/95;
+  }
+  
+  /* Improved scrollbars */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(155, 155, 155, 0.5);
+    border-radius: 20px;
+  }
+  
+  /* Mobile optimizations for typing test */
+  .mobile-typing-test {
+    @apply max-w-full overflow-hidden;
+  }
+  
+  .mobile-optimized {
+    @apply touch-pan-y;
+  }
+
+  .mobile-text-container {
+    @apply max-h-[50vh] overflow-y-auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .mobile-typing-section {
+    @apply mt-1;
+  }
+  
+  .mobile-typing-text {
+    @apply text-sm leading-relaxed py-2 px-3;
+    letter-spacing: 0.03em;
+    word-spacing: 0.2em;
+  }
+  
+  .mobile-running .typing-char.current {
+    @apply bg-primary/20 px-1 py-0.5 rounded-md border-b-2 border-primary/50;
+  }
+  
+  .mobile-test-header {
+    @apply py-2 px-2 bg-card/50 rounded-lg shadow-sm;
+  }
+  
+  .mobile-test-controls {
+    @apply fixed bottom-4 left-0 right-0 mx-auto w-[95%] bg-card/95 backdrop-blur-sm 
+           p-2 rounded-lg shadow-md border border-border/50 z-10;
+  }
+  
+  .mobile-touch-active .typing-text-container {
+    @apply border-primary/30 bg-background/95 shadow-md transition-all duration-300;
+  }
+  
+  /* Enhanced focus styles for touch interfaces */
+  @media (hover: none) {
+    .mobile-test-input:focus ~ .typing-text-container {
+      @apply ring-2 ring-primary/50;
+    }
+    
+    .mobile-touch-active .typing-char.current::after {
+      @apply opacity-100;
+      animation: mobileCaretPulse 1.2s infinite;
+    }
+  }
+  
+  @keyframes mobileCaretPulse {
+    0%, 100% { opacity: 0.5; height: 2px; }
+    50% { opacity: 1; height: 3px; }
+  }
+  
+  /* Better tap targets for mobile */
+  .mobile-typing-test button,
+  .mobile-typing-test [role="button"] {
+    @apply min-h-[42px] active:bg-opacity-90;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Define custom touch-callout utility */
+  .touch-callout-none {
+    -webkit-touch-callout: none;
+    -ms-touch-callout: none;
+    touch-callout: none;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 220 25% 97%;
+    --foreground: 224 71% 4%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 224 71% 4%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71% 4%;
+    
+    --primary: 222 89% 58%;
+    --primary-rgb: 65, 130, 255;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 220 14% 94%;
+    --secondary-foreground: 222 47% 11%;
+    
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 8% 46%;
+    
+    --accent: 262 83% 62%;
+    --accent-rgb: 154, 80, 255;
+    --accent-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 220 13% 90%;
+    --input: 220 13% 90%;
+    --ring: 222 89% 58%;
+    
+    --radius: 0.75rem;
+    
+    --correct: 142 76% 40%;
+    --incorrect: 0 72% 51%;
+    --current: 262 83% 62%;
+    --current-rgb: 154, 80, 255;
+  }
+  
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 210 20% 98%;
+    
+    --card: 224 71% 6%;
+    --card-foreground: 210 20% 98%;
+    
+    --popover: 224 71% 6%;
+    --popover-foreground: 210 20% 98%;
+    
+    --primary: 217 92% 60%;
+    --primary-rgb: 56, 124, 255;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 217 33% 18%;
+    --secondary-foreground: 210 20% 98%;
+    
+    --muted: 217 33% 18%;
+    --muted-foreground: 215 20% 70%;
+    
+    --accent: 262 83% 65%;
+    --accent-rgb: 157, 78, 255;
+    --accent-foreground: 0 0% 100%;
+    
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 20% 98%;
+    
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 224 76% 48%;
+    
+    --correct: 142 71% 45%;
+    --incorrect: 0 63% 31%;
+    --current: 262 83% 65%;
+    --current-rgb: 157, 78, 255;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Improved focus state for better accessibility */
+  :focus-visible {
+    @apply outline-primary outline-offset-2;
+  }
+
+  /* Improved tap targets for mobile */
+  @media (max-width: 640px) {
+    button, a, input, select, [role="button"] {
+      @apply min-h-[44px] min-w-[44px];
+    }
+  }
+}
+
+/* Custom glass styling */
+.glass {
+  @apply bg-background/70 backdrop-blur-md border border-border/50 shadow-soft rounded-xl;
+}
+
+/* Typing test specific styling */
+.typing-text {
+  @apply text-lg sm:text-xl leading-relaxed font-mono p-4 sm:p-6 rounded-xl bg-card shadow-soft;
+  word-break: break-word;
+  transition: font-size 0.3s ease, line-height 0.3s ease;
+}
+
+.typing-char {
+  @apply relative transition-all duration-100;
+  display: inline-block;
+  min-width: 0.4em; /* Ensure minimum width for all characters */
+  position: relative; /* Ensure position is set for all characters */
+  z-index: 1; /* Set base z-index */
+}
+
+/* Fix character display issues with exact styling */
+.typing-char[data-char-state="current"] {
+  @apply text-current font-bold;
+  position: relative;
+  z-index: 2; /* Higher z-index for current character */
+  box-shadow: 0 0 0 1px rgba(var(--current-rgb), 0.1); /* Subtle highlight */
+  border-radius: 2px;
+}
+
+/* Special character styling */
+.typing-char.space-char {
+  @apply border-b border-dashed border-foreground/10;
+  min-width: 0.6em; /* Ensure spaces have proper width */
+}
+
+.typing-char.neutral {
+  @apply text-foreground/80;
+}
+
+.typing-char.correct {
+  @apply text-correct font-medium;
+}
+
+.typing-char.incorrect {
+  @apply text-incorrect;
+  text-decoration: underline;
+  text-decoration-color: hsl(var(--incorrect));
+}
+
+.typing-char.current {
+  @apply text-current font-bold;
+  position: relative;
+}
+
+.typing-char.current::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: hsl(var(--current));
+  animation: blink 1s infinite;
+}
+
+/* Fix for mobile character display */
+@media (max-width: 640px) {
+  .typing-text {
+    @apply p-3 text-base leading-relaxed;
+  }
+  
+  .typing-char {
+    padding: 0 1px; /* Add slight padding between characters on mobile */
+    letter-spacing: 0.03em; /* Add slight spacing between characters */
+  }
+  
+  .typing-char.space-char {
+    min-width: 0.5em;
+  }
+  
+  .typing-char[data-char-state="current"] {
+    background-color: rgba(var(--current-rgb), 0.15);
+    box-shadow: 0 0 0 2px rgba(var(--current-rgb), 0.2);
+  }
+  
+  .word-spacing-wide {
+    word-spacing: 0.15em;
+    letter-spacing: 0.01em;
+  }
+}
+
+/* Other animations */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Fix character spacing issues on mobile */
+@media (max-width: 640px) {
+  .typing-char {
+    letter-spacing: 0.03em; /* Add slight spacing between characters */
+  }
+  
+  .typing-char[data-char-state="current"] {
+    background-color: rgba(var(--current-rgb), 0.15);
+    box-shadow: 0 0 0 2px rgba(var(--current-rgb), 0.2);
+  }
+
+  /* Character highlighting for touch devices */
+  @media (hover: none) {
+    .typing-char[data-char-state="current"] {
+      padding: 0 2px;
+      margin: 0 1px;
+      animation: pulseBg 1.5s infinite;
+    }
+    
+    @keyframes pulseBg {
+      0%, 100% { background-color: rgba(var(--current-rgb), 0.1); }
+      50% { background-color: rgba(var(--current-rgb), 0.25); }
+    }
+  }
+}
+
+/* Other animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+  from { 
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* Improved custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Mobile optimized scrollbar */
+@media (max-width: 640px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+/* Gradient effects */
+.gradient-heading {
+  @apply bg-gradient-to-r from-primary via-[hsl(242,85%,60%)] to-accent bg-clip-text text-transparent;
+}
+
+.gradient-border {
+  position: relative;
+  border-radius: var(--radius);
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(242 85% 60%), hsl(var(--accent)));
+  border-radius: calc(var(--radius) + 1px);
+  z-index: -1;
+  opacity: 0.8;
+  animation: borderGlow 8s infinite alternate;
+}
+
+@keyframes borderGlow {
+  0% { opacity: 0.6; }
+  100% { opacity: 0.9; }
+}
+
+/* Card styles */
+.card-hover {
+  @apply transition-all duration-300 hover:translate-y-[-2px] hover:shadow-card;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-gradient-to-r from-primary via-[hsl(242,85%,60%)] to-accent text-white font-medium py-2 px-4 rounded-lg 
+  transition-all duration-300 hover:shadow-glow active:translate-y-[1px];
+}
+
+/* Focus mode enhanced */
+.focus-mode-text {
+  @apply text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto;
+}
+
+/* Enhanced shadows */
+.shadow-soft {
+  box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-card {
+  box-shadow: 
+    0 4px 15px -3px rgba(0, 0, 0, 0.1),
+    0 2px 8px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-glow {
+  box-shadow: 
+    0 0 18px rgba(var(--primary-rgb), 0.35),
+    0 0 8px rgba(var(--accent-rgb), 0.25);
+}
+
+/* Animated background */
+.animated-bg {
+  background-size: 300% 300%;
+  animation: gradientShift 12s ease infinite;
+  background-image: linear-gradient(
+    -45deg, 
+    hsl(var(--primary)/0.08) 0%, 
+    hsl(242 85% 60%/0.08) 25%, 
+    hsl(var(--accent)/0.08) 50%, 
+    hsl(242 85% 60%/0.08) 75%, 
+    hsl(var(--primary)/0.08) 100%
+  );
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Enhanced hero section */
+.hero-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(var(--primary-rgb), 0.05) 0%, transparent 25%),
+    radial-gradient(circle at 80% 70%, rgba(var(--accent-rgb), 0.07) 0%, transparent 35%);
+  opacity: 0.8;
+  z-index: 0;
+}
+
+.gradient-heading {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70;
+  position: relative;
+}
+
+.gradient-heading::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, hsl(var(--primary)/20%), transparent);
+}
+
+.card-3d {
+  transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1);
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  backface-visibility: hidden;
+}
+
+.card-3d:hover {
+  transform: perspective(1000px) rotateX(2deg) rotateY(2deg) scale3d(1.02, 1.02, 1.02);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+}
+
+.glass-card {
+  @apply bg-background/70 backdrop-blur-md border border-border/50 shadow-soft rounded-xl;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    130deg, 
+    rgba(255, 255, 255, 0.05), 
+    rgba(255, 255, 255, 0.18) 30%, 
+    rgba(255, 255, 255, 0) 50%
+  );
+  pointer-events: none;
+}
+
+.dark .glass-card::before {
+  background: linear-gradient(
+    130deg, 
+    rgba(255, 255, 255, 0.03), 
+    rgba(255, 255, 255, 0.08) 30%, 
+    rgba(255, 255, 255, 0) 50%
+  );
+}
+
+.hover:shadow-glow:hover {
+  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.4);
+}
+
+.dark .hover:shadow-glow:hover {
+  box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.3);
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.group-hover\:animate-pulse:hover {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Enhanced mobile experience */
+@media (max-width: 640px) {
+  .hero-section {
+    background-attachment: scroll;
+    background-position: center;
+  }
+  
+  .gradient-heading::after {
+    bottom: -2px;
+  }
+  
+  .float {
+    animation: none;
+  }
+}
+
+/* Focus state improvements */
+:focus-visible {
+  @apply outline-primary outline-offset-2;
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.3);
+}
+
+/* Mobile-first responsive designs */
+@media (max-width: 640px) {
+  .container {
+    @apply px-4;
+  }
+  
+  h1 {
+    @apply text-3xl;
+  }
+  
+  h2 {
+    @apply text-2xl;
+  }
+  
+  .card {
+    @apply p-4;
+  }
+  
+  .typing-text {
+    max-height: 180px;
+  }
+  
+  .focus-mode-text {
+    @apply text-base;
+  }
+}
+
+/* Tooltip improvements */
+.tooltip {
+  @apply relative inline-block;
+}
+
+.tooltip .tooltip-text {
+  @apply invisible absolute z-10 p-2 text-sm text-white bg-gray-900 rounded-md opacity-0 transition-opacity duration-300;
+  width: 120px;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  text-align: center;
+}
+
+.tooltip:hover .tooltip-text {
+  @apply visible opacity-100;
+}
+
+/* Add this to enable smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Add this for better touch interactions on mobile */
+@media (hover: none) {
+  .card-hover:hover,
+  .btn-primary:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .card-hover:active,
+  .btn-primary:active {
+    transform: translateY(1px);
+  }
+}
+
+/* Better tap highlights for mobile */
+@media (hover: none) {
+  a:active, button:active, [role="button"]:active {
+    @apply bg-primary/10;
+  }
+}
+
+/* Mobile optimizations */
+.letter-spacing-wide {
+  letter-spacing: 1px;
+}
+
+.word-spacing-wide {
+  word-spacing: 3px;
+}
+
+.mobile-current-char {
+  background-color: rgba(var(--primary), 0.2);
+  position: relative;
+  border-radius: 4px;
+  padding: 0 2px;
+  margin: 0 1px;
+}
+
+.mobile-current-char::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: rgba(var(--primary), 0.6);
+  animation: pulse 1.5s infinite;
+}
+
+.touch-active .typing-text {
+  background-color: rgba(var(--primary), 0.05);
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
+    transform: scaleX(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0.4;
+    transform: scaleX(0.8);
+  }
+}
+
+/* Add mobile-specific enhancements */
+@media (max-width: 640px) {
+  .typing-text {
+    @apply text-sm leading-relaxed p-3;
+    overflow-wrap: break-word;
+  }
+  
+  .typing-char.current {
+    @apply bg-primary/10 rounded-sm;
+  }
+  
+  .mobile-typing-test.touch-active .typing-text-container {
+    @apply scale-[1.01] transition-transform duration-150;
+  }
+  
+  .mobile-optimized .typing-text {
+    letter-spacing: 0.03em;
+    word-spacing: 0.2em;
+  }
+  
+  .mobile-typing-test:not(.fullscreen-mode) .test-controls {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 2rem);
+    z-index: 50;
+    background-color: hsl(var(--card) / 0.97);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-radius: 0.75rem;
+    border: 1px solid hsl(var(--border) / 0.5);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
+  }
+}
+
+/* Add additional mobile-specific enhancements for code view */
+.code-mobile {
+  font-size: 0.8rem;
+}
+
+.code-mobile pre {
+  padding: 0.5rem !important;
+}
+
+.code-mobile .line-numbers .line-numbers-rows {
+  font-size: 0.8rem;
+  padding-left: 0.5rem;
+}
+
+.code-mobile .token {
+  font-size: 0.8rem;
+}
+
+@media (max-width: 640px) {
+  .code-mobile pre[class*="language-"],
+  .code-mobile code[class*="language-"] {
+    font-size: 0.8rem;
+    padding: 0.5rem;
+  }
+  
+  .code-mobile pre[class*="language-"] {
+    margin: 0.5rem 0;
+  }
+  
+  /* Improve line number visibility on mobile */
+  .code-mobile .line-numbers-rows > span:before {
+    padding-right: 0.8em;
+  }
+  
+  /* Optimize code block margins for mobile */
+  .code-mobile pre.line-numbers {
+    padding-left: 2.5em;
+  }
+}
+
+/* Dynamic text sizing */
+.dynamic-text-container {
+  transition: all 0.3s ease-in-out;
+}
+
+.dynamic-text {
+  transition: font-size 0.3s ease, line-height 0.3s ease, letter-spacing 0.2s ease;
+}
+
+/* Text size modifiers based on container width and text length */
+@media (min-width: 1024px) {
+  .dynamic-text-container .dynamic-text {
+    font-size: 1.5rem;
+    line-height: 1.8;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .dynamic-text-container .dynamic-text {
+    font-size: 1.35rem;
+    line-height: 1.7;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 767px) {
+  .dynamic-text-container .dynamic-text {
+    font-size: 1.25rem;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 639px) {
+  .dynamic-text-container .dynamic-text {
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+}
+
+/* Enhance the visibility of the current character */
+.dynamic-text-container .typing-char[data-char-state="current"] {
+  position: relative;
+  z-index: 5;
+  background-color: rgba(var(--current-rgb), 0.15);
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px rgba(var(--current-rgb), 0.2);
+  transition: all 0.2s ease;
+}
+
+/* Adjust container height and spacing dynamically */
+.typing-area {
+  min-height: 40vh;
+  max-height: 70vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  transition: min-height 0.3s ease, max-height 0.3s ease;
+}
+
+/* Text tracking variations */
+.tracking-tight {
+  letter-spacing: -0.01em;
+}
+
+.tracking-wide {
+  letter-spacing: 0.02em;
+}
+
+/* Enhance focus and fullscreen modes */
+.focus-mode .typing-area {
+  min-height: 50vh;
+}
+
+.fullscreen-mode .typing-area {
+  min-height: 60vh;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+/* Fullscreen and focus mode text containers */
+.fullscreen-text-container {
+  max-width: 90%;
+  margin: 0 auto;
+  min-height: 50vh;
+}
+
+.focus-mode-text-container {
+  max-width: 85ch;
+  margin: 0 auto;
+}
+
+.fullscreen-typing-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+}
+
+.focus-mode-typing-section {
+  max-width: 90ch;
+  margin: 0 auto;
+}
+
+/* Enhanced dynamic text sizing in focus mode */
+.focus-mode .dynamic-text {
+  font-size: 1.5rem;
+  line-height: 2;
+}
+
+.fullscreen-mode .dynamic-text {
+  font-size: 1.75rem;
+  line-height: 2.1;
+}
+
+/* Responsive adjustments for the typing area */
+@media (min-width: 1280px) {
+  .fullscreen-mode .typing-area,
+  .focus-mode .typing-area {
+    padding: 2rem;
+  }
+  
+  .fullscreen-mode .dynamic-text,
+  .focus-mode .dynamic-text {
+    font-size: 1.75rem;
+    line-height: 2.1;
+  }
+}
+
+/* Tablet view optimizations */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .fullscreen-mode .typing-area,
+  .focus-mode .typing-area {
+    padding: 1.5rem;
+  }
+  
+  .fullscreen-mode .dynamic-text,
+  .focus-mode .dynamic-text {
+    font-size: 1.5rem;
+    line-height: 1.9;
+  }
+}
+
+/* Mobile view optimizations */
+@media (max-width: 767px) {
+  .fullscreen-mode .typing-area,
+  .focus-mode .typing-area {
+    padding: 1rem;
+  }
+  
+  .fullscreen-mode .dynamic-text,
+  .focus-mode .dynamic-text {
+    font-size: 1.25rem;
+    line-height: 1.7;
+  }
+  
+  .fullscreen-text-container,
+  .focus-mode-text-container {
+    max-width: 100%;
+  }
+}
+
+/* Dynamic character highlighting */
+.dynamic-highlight {
+  position: relative;
+  z-index: 5;
+  background-color: rgba(var(--current-rgb), 0.15);
+  border-radius: 3px;
+  padding: 0 2px;
+  margin: 0 1px;
+  box-shadow: 0 0 0 2px rgba(var(--current-rgb), 0.2);
+  transition: all 0.2s ease-in-out;
+  animation: highlightPulse 1.5s infinite;
+}
+
+@keyframes highlightPulse {
+  0%, 100% { background-color: rgba(var(--current-rgb), 0.1); }
+  50% { background-color: rgba(var(--current-rgb), 0.25); }
+}
+
+/* Improved typing text layout and sizing */
+.typing-text-container {
+  position: relative;
+  transition: all 0.4s ease-in-out;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.fullscreen-text-container .typing-text,
+.focus-mode-text-container .typing-text {
+  max-width: 100ch;
+  margin: 0 auto;
+}
+
+/* Adjust current character visibility as text size changes */
+@media (min-width: 768px) {
+  .dynamic-highlight::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: rgba(var(--current-rgb), 0.8);
+    animation: pulseWidth 1.5s infinite;
+  }
+  
+  @keyframes pulseWidth {
+    0%, 100% { transform: scaleX(0.8); opacity: 0.6; }
+    50% { transform: scaleX(1); opacity: 1; }
+  }
+}
+
+/* Fine-tune container heights based on viewport */
+@media (min-height: 900px) {
+  .typing-area {
+    min-height: 50vh;
+  }
+  
+  .fullscreen-mode .typing-area {
+    min-height: 60vh;
+  }
+}
+
+@media (max-height: 700px) {
+  .typing-area {
+    min-height: 30vh;
+    max-height: 60vh;
+  }
+}
+
+/* Enhanced typing test container */
+.typing-text-container {
+  position: relative;
+  transition: all 0.4s ease-in-out;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+/* Focus mode enhancements */
+.focus-mode .typing-text-container {
+  min-height: 50vh;
+  max-width: 95%;
+  margin: 0 auto;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.focus-mode-typing-section {
+  max-width: 80ch;
+  margin: 0 auto;
+}
+
+/* Fullscreen mode enhancements */
+.fullscreen-mode .typing-text-container {
+  min-height: 60vh;
+  max-width: 90vw;
+  margin: 0 auto;
+}
+
+.fullscreen-typing-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+}
+
+/* Improved dynamic text sizing */
+.typing-text {
+  font-size: clamp(1rem, 1.5vw + 0.5rem, 1.75rem);
+  line-height: clamp(1.5, 1.5vw + 1, 2);
+  letter-spacing: 0.01em;
+  transition: all 0.3s ease;
+  padding: clamp(1rem, 2vw, 2rem);
+}
+
+.focus-mode .typing-text {
+  font-size: clamp(1.25rem, 2vw + 0.5rem, 2rem);
+  line-height: clamp(1.75, 2vw + 1, 2.25);
+}
+
+.fullscreen-mode .typing-text {
+  font-size: clamp(1.5rem, 2.5vw + 0.5rem, 2.25rem);
+  line-height: clamp(2, 2.5vw + 1, 2.5);
+}
+
+/* Character display improvements */
+.typing-char {
+  position: relative;
+  min-width: 0.4em;
+  display: inline-block;
+  padding: 0.1em 0;
+  transition: all 0.15s ease-out;
+  border-radius: 0.15em;
+}
+
+.typing-char[data-char-state="current"] {
+  position: relative;
+  animation: pulse-highlight 1.5s infinite ease-in-out;
+  font-weight: bold;
+  background-color: rgba(var(--primary-rgb), 0.15);
+  border-radius: 0.15em;
+  z-index: 5;
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.15);
+}
+
+@keyframes pulse-highlight {
+  0%, 100% { background-color: rgba(var(--primary-rgb), 0.1); }
+  50% { background-color: rgba(var(--primary-rgb), 0.25); }
+}
+
+/* Space character enhancement */
+.typing-char.space-char {
+  min-width: 0.6em;
+  position: relative;
+}
+
+.typing-char.space-char::after {
+  content: '';
+  position: absolute;
+  bottom: 0.1em;
+  left: 0.1em;
+  right: 0.1em;
+  height: 1px;
+  background-color: rgba(var(--foreground-rgb), 0.2);
+}
+
+/* Responsive adjustments for the typing area */
+@media (min-width: 1280px) {
+  .typing-area {
+    min-height: 45vh;
+    max-height: 70vh;
+  }
+}
+
+@media (max-width: 640px) {
+  .typing-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    padding: 0.75rem;
+  }
+  
+  .focus-mode .typing-text-container {
+    min-height: 40vh;
+  }
+}
+
+/* Running state animation */
+.running-container {
+  animation: container-glow 2s infinite alternate;
+}
+
+@keyframes container-glow {
+  from { box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.1); }
+  to { box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.2); }
+}
+
+/* Mobile Focus Mode Enhancements */
+.mobile-focus-mode .typing-text-container {
+  min-height: 60vh;
+  padding: 1.5rem !important;
+  border-radius: 1rem;
+  background-color: rgba(var(--card-rgb), 0.8);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-fullscreen-container {
+  min-height: 80vh !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5rem !important;
+  border-radius: 0.75rem;
+  margin: 0 auto;
+}
+
+.mobile-fullscreen-text {
+  font-size: 1.25rem !important;
+  line-height: 1.8 !important;
+  letter-spacing: 0.01em;
+  word-spacing: 0.2em;
+}
+
+.mobile-fullscreen-typing-text {
+  margin: 0 auto;
+  max-width: 100%;
+  padding: 0.5rem 0;
+}
+
+.mobile-focus-char {
+  position: relative;
+}
+
+.mobile-focus-char::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 3px;
+  background-color: rgba(var(--primary-rgb), 0.6);
+  border-radius: 1px;
+  animation: mobileCursorPulse 1.2s infinite;
+}
+
+.mobile-fullscreen-char {
+  position: relative;
+  background-color: rgba(var(--primary-rgb), 0.15);
+  border-radius: 3px;
+  padding: 0 2px;
+  margin: 0 1px;
+}
+
+.mobile-fullscreen-char::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 3px;
+  background-color: rgba(var(--primary-rgb), 0.8);
+  border-radius: 1px;
+  animation: mobileCursorPulse 1.2s infinite;
+}
+
+@keyframes mobileCursorPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.touch-active-container {
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.3);
+  transition: all 0.2s ease;
+}
+
+.mobile-typing-area {
+  border-radius: 1rem;
+  background-color: rgba(var(--card-rgb), 0.7);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+/* Enhanced mobile touch experience */
+@media (max-width: 640px) {
+  .typing-text-container {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+  }
+  
+  .mobile-focus-container {
+    min-height: 50vh;
+  }
+  
+  .focus-mode.mobile-focus-mode .typing-text-container {
+    border: 2px solid rgba(var(--primary-rgb), 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background-color: rgba(var(--card-rgb), 0.95);
+  }
+  
+  .mobile-focus-mode {
+    padding: 0.5rem !important;
+  }
+  
+  /* Mini controls in fullscreen mode */
+  .fullscreen-mode .typing-test-section,
+  .mobile-focus-mode .typing-test-section {
+    position: relative;
+  }
+}
+
+/* Responsive adjustments for the typing area */
+@media (min-width: 1280px) {
+  .typing-area {
+    min-height: 45vh;
+    max-height: 70vh;
+  }
+}
+
+@media (max-width: 640px) {
+  .typing-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    padding: 0.75rem;
+  }
+  
+  .focus-mode .typing-text-container {
+    min-height: 40vh;
+  }
+}
+
+/* Running state animation */
+.running-container {
+  animation: container-glow 2s infinite alternate;
+}
+
+@keyframes container-glow {
+  from { box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.1); }
+  to { box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.2); }
+}
+
+/* Enhanced mobile UI styles for typing test */
+.mobile-enhanced-container {
+  width: 100%;
+  padding: 1rem;
+  margin: 0;
+  border-radius: 0.75rem;
+  font-size: 1.125rem;
+  line-height: 1.75;
+  background-color: rgba(var(--card-rgb), 0.7);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  touch-action: manipulation;
+}
+
+.mobile-char {
+  padding: 0.15rem 0.05rem;
+  margin: 0 0.05rem;
+  border-radius: 2px;
+  font-weight: 500;
+}
+
+.mobile-char.current {
+  background-color: rgba(var(--primary-rgb), 0.2);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(var(--primary-rgb), 0.2);
+  position: relative;
+}
+
+.mobile-char.current::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background-color: rgba(var(--primary-rgb), 0.8);
+  border-radius: 1px;
+}
+
+.mobile-typing-display {
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  max-height: 70vh !important;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.mobile-fullscreen-typing-display {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  max-height: 85vh !important;
+  font-size: 1.25rem;
+  line-height: 1.8;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.paused-typing-display {
+  opacity: 0.8;
+  filter: blur(0.5px);
+  transition: all 0.3s ease;
+}
+
+/* Ensure touch targets are large enough */
+@media (max-width: 768px) {
+  .typing-text-container {
+    width: 100%;
+    margin: 0 auto;
+    max-width: 100%;
+  }
+  
+  .mobile-text-container {
+    padding: 0.5rem !important;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Optimize for fat finger taps */
+  button,
+  [role="button"] {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 0.5rem;
+  }
+}
+
+.mobile-optimized-container {
+  padding: 0.5rem !important;
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Improved mobile styling for typing test */
+@media (max-width: 640px) {
+  .mobile-optimized-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0.5rem !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    border-radius: 0.75rem !important;
+  }
+
+  .mobile-typing-test {
+    padding: 0.5rem;
+    touch-action: manipulation;
+  }
+
+  .mobile-text-container {
+    padding: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+    border-radius: 0.75rem !important;
+  }
+
+  .test-header {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .typing-text-container {
+    padding: 0.5rem !important;
+  }
+
+  .mobile-test-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 1rem !important;
+    padding: 0 0.5rem !important;
+  }
+
+  /* Ensure Test Duration is visible on mobile */
+  .mobile-test-header .test-duration {
+    display: flex !important;
+    margin-right: 0.5rem !important;
+  }
+  
+  /* Ensure timer is clearly visible */
+  .mobile-test-header .timer-badge {
+    font-size: 1rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  /* Make buttons more touchable */
+  button, 
+  [role="button"] {
+    min-height: 40px;
+    min-width: 40px;
+  }
+
+  .typing-char.current {
+    background-color: rgba(var(--primary-rgb), 0.2);
+    border-radius: 3px;
+    position: relative;
+    padding: 0 2px;
+  }
+
+  .typing-char.current::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 2px;
+    background-color: rgba(var(--primary-rgb), 0.9);
+    border-radius: 1px;
+  }
+
+  /* Improve test controls on mobile */
+  .test-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+}
+
+/* Code display enhancements */
+.code-container {
+  position: relative;
+  font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  border-radius: 0.375rem;
+}
+
+.code-container pre {
+  background-color: rgb(45, 45, 45);
+  border-radius: 0.375rem;
+  margin: 0;
+}
+
+.code-container .line-numbers {
+  counter-reset: line;
+  padding: 1rem 1.25rem 1rem 3.5rem;
+}
+
+@media (max-width: 640px) {
+  .code-container .line-numbers {
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+.code-container pre[class*="language-"] {
+  tab-size: 2;
+}
+
+.code-container .line-numbers-rows {
+  left: 0.75rem !important;
+  width: 2rem !important;
+}
+
+.code-container .token.operator,
+.code-container .token.entity,
+.code-container .token.url,
+.code-container .token.string {
+  background: transparent;
+}
+
+.code-container .token.comment {
+  font-style: italic;
+  color: #6a9955;
+}
+
+.code-container .token.keyword {
+  color: #569cd6;
+}
+
+.code-container .token.string {
+  color: #ce9178;
+}
+
+.code-container .token.function {
+  color: #dcdcaa;
+}
+
+/* Special characters styling */
+.special-char {
+  background-color: rgba(var(--muted-foreground), 0.05);
+  border-radius: 3px;
+  border-bottom: 1px dashed rgba(var(--muted-foreground), 0.3);
+  margin: 0 1px;
+  min-width: 0.7em;
+  display: inline-flex;
+  justify-content: center;
+}
+
+/* Space character enhancement */
+.typing-char.space-char {
+  min-width: 0.6em;
+  position: relative;
+  border-bottom: 1px dashed rgba(var(--foreground-rgb), 0.2);
+}
+
+.typing-char.space-char[data-char-state="current"] {
+  background-color: rgba(var(--current-rgb), 0.15);
+  border-bottom: 1px solid rgba(var(--current-rgb), 0.3);
+}
+
+.typing-char.space-char[data-char-state="correct"] {
+  border-bottom: 1px solid rgba(var(--correct), 0.3);
+}
+
+.typing-char.space-char[data-char-state="incorrect"] {
+  background-color: rgba(var(--incorrect), 0.1);
+  border-bottom: 1px solid rgba(var(--incorrect), 0.4);
+}
+
+/* Fix precision with character edges */
+.typing-char {
+  padding: 0.05em 0;
+  margin: 0 0.01em;
+  border-radius: 0.15em;
+  display: inline-block;
+  position: relative;
+  min-width: 0.5em;
+  line-height: 1.5em;
+  vertical-align: baseline;
+}
+
+/* Improve character highlight accuracy */
+.typing-char[data-char-state="current"] {
+  position: relative;
+  background-color: rgba(var(--current-rgb), 0.15);
+  border-radius: 0.15em;
+  font-weight: bold;
+  outline: 1px solid rgba(var(--current-rgb), 0.2);
+  z-index: 5;
+}
+
+/* Fix incorrect character display */
+.typing-char[data-char-state="incorrect"] {
+  position: relative;
+  background-color: rgba(var(--incorrect), 0.1);
+  text-decoration: none;
+  border-bottom: 2px solid rgba(var(--incorrect), 0.5);
+}
+
+/* Add mobile specific improvements */
+@media (max-width: 640px) {
+  .typing-char {
+    padding: 0.1em 0.05em;
+    margin: 0 0.02em;
+    min-width: 0.6em;
+  }
+  
+  .typing-char[data-char-state="current"] {
+    padding-left: 0.1em;
+    padding-right: 0.1em;
+    box-shadow: 0 0 0 1px rgba(var(--current-rgb), 0.3);
+  }
+  
+  .special-char {
+    margin: 0 0.05em;
+    padding: 0.1em 0.1em;
+  }
+}
+
+/* Mobile TestSettings improvements */
+@media (max-width: 640px) {
+  .drawer-content {
+    max-height: 90vh !important;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Add safe area padding for iOS devices */
+  .pb-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom, 1rem) + 1rem);
+  }
+
+  /* Improve touch targets for settings */
+  .setting-card {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 12px;
+  }
+  
+  /* More space for radio buttons on mobile */
+  .radio-group-item + label {
+    min-height: 3rem;
+    min-width: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+  }
+  
+  /* Improved scrolling for settings content */
+  .settings-scroll-area {
+    max-height: 65vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 0.5rem;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 1%, black 99%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 1%, black 99%, transparent 100%);
+  }
+  
+  /* Sticky tabs for mobile view */
+  .mobile-tabs-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: hsl(var(--background));
+    border-bottom: 1px solid hsl(var(--border) / 0.2);
+    padding: 0.5rem 0;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  
+  /* Larger touch targets for settings toggles */
+  .setting-toggle {
+    min-height: 1.75rem;
+    min-width: 3rem;
+  }
+  
+  /* Button enhancements for mobile */
+  .mobile-button {
+    min-height: 3rem;
+    font-size: 1rem;
+    padding: 0 1.5rem;
+  }
+  
+  /* Expandable section indicators */
+  .expand-indicator {
+    transition: transform 0.2s ease;
+  }
+  
+  .expand-indicator.expanded {
+    transform: rotate(180deg);
+  }
+  
+  /* Visual feedback on touch */
+  .touch-active {
+    background-color: hsl(var(--primary) / 0.05);
+    transition: background-color 0.2s ease;
+  }
+  
+  /* Active state animation for settings cards */
+  .setting-card:active {
+    transform: scale(0.98);
+    transition: transform 0.2s ease;
+  }
+}
