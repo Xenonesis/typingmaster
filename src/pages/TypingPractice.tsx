@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useTypingStats } from "@/context/TypingStatsContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Keyboard, BarChart2, XCircle, Trophy, Zap, RefreshCw } from "lucide-react";
+import { Keyboard, BarChart2, XCircle, Trophy, Zap, RefreshCw, Type } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
@@ -232,6 +232,15 @@ const TypingPractice = () => {
               >
                 <Trophy className="h-4 w-4 mr-2" />
                 Full Typing Test
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/word-practice')}
+                className="hidden sm:flex"
+              >
+                <Type className="h-4 w-4 mr-2" />
+                Word Practice
               </Button>
               <Button 
                 variant="default" 

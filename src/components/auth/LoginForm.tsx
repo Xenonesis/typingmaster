@@ -1,19 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
+import { clearSupabaseData } from '@/lib/supabase';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, clearAuthData } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Clear all auth data on component mount
+  useEffect(() => {
+    clearAuthData();
+  }, [clearAuthData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,8 +34,11 @@ export function LoginForm() {
     }
     
     setIsLoading(true);
-    
+
     try {
+      // Pre-emptively clear any auth data
+      clearAuthData();
+      
       const { error } = await signIn(email, password);
       
       if (error) {
@@ -43,7 +52,9 @@ export function LoginForm() {
           title: "Login successful",
           description: "Welcome back!",
         });
-        navigate('/');
+        
+        // Force page refresh to the home page
+        window.location.href = '/';
       }
     } catch (err) {
       toast({

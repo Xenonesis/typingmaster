@@ -18,6 +18,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { getProfile, upsertProfile, UserProfile } from "@/services/userService";
+import { RecentAchievements } from "@/components/profile/RecentAchievements";
 
 // Main Profile component without ThemeProvider
 function ProfileContent() {
@@ -152,31 +153,45 @@ function ProfileContent() {
     }));
   };
 
-  // Save profile data
-  const handleSaveProfile = async () => {
-    if (!user) return;
+  // Handle theme preference change
+  const handleThemeChange = (value: string) => {
+    setThemePreference(value);
+    localStorage.setItem("typingTheme", value);
     
+    // Apply theme based on preference
+    if (value === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      setTheme(systemTheme);
+    } else {
+      setTheme(value as "light" | "dark");
+    }
+  };
+  
+  // Save profile
+  const handleSaveProfile = async () => {
+    if (!user || !user.id) return;
+    
+    setLoading(true);
     try {
-      setLoading(true);
-      
-      // Ensure user_id is set
-      const profileData = {
+      const savedProfile = await upsertProfile({
         ...profile,
-        user_id: user.id,
-        updated_at: new Date().toISOString()
-      };
+        user_id: user.id
+      });
       
-      await upsertProfile(profileData);
+      setProfile(prev => ({
+        ...prev,
+        ...savedProfile
+      }));
       
       toast({
-        title: "Profile updated",
-        description: "Your profile information has been saved successfully.",
+        title: "Profile Saved",
+        description: "Your profile has been updated successfully."
       });
     } catch (error) {
       console.error("Error saving profile:", error);
       toast({
         title: "Error",
-        description: "Failed to save profile data",
+        description: "Failed to save profile. " + (error.message || ''),
         variant: "destructive",
       });
     } finally {
@@ -362,18 +377,35 @@ function ProfileContent() {
                     </>
                   )}
                   
-                  <div className="pt-4 flex gap-4">
-                    <Button onClick={handleSaveProfile} disabled={loading}>
-                      {loading ? 'Saving...' : 'Save Profile'}
-                    </Button>
-                    <Button onClick={handleSignOut} variant="outline">
-                      Sign Out
-                    </Button>
+                  <div className="space-y-2">
+                    <Label htmlFor="theme">Theme Preference</Label>
+                    <Select
+                      value={themePreference}
+                      onValueChange={handleThemeChange}
+                    >
+                      <SelectTrigger id="theme">
+                        <SelectValue placeholder="Select theme" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="system">System</SelectItem>
+                        <SelectItem value="light">Light</SelectItem>
+                        <SelectItem value="dark">Dark</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
+                  
+                  <Button 
+                    onClick={handleSaveProfile} 
+                    disabled={loading}
+                    className="w-full mt-4"
+                  >
+                    {loading ? 'Saving...' : 'Save Profile'}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
             
+            <div className="space-y-6">
             <Card className="shadow-card border-border/30">
               <CardHeader className="bg-background/50">
                 <CardTitle>Profile Stats</CardTitle>
@@ -414,6 +446,9 @@ function ProfileContent() {
                 </div>
               </CardContent>
             </Card>
+              
+              <RecentAchievements />
+            </div>
           </div>
         </div>
       </main>

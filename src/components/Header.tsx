@@ -1,6 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
 import { 
   BarChart2,
   Trophy, 
@@ -26,7 +27,8 @@ import {
   Bot,
   Target,
   Brain,
-  Sparkles
+  Sparkles,
+  Type
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -51,6 +53,8 @@ const textShadowStyle = `
 
 export function Header() {
   const { theme } = useTheme();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [testCount, setTestCount] = useState(0);
@@ -108,6 +112,22 @@ export function Header() {
       // window.removeEventListener('testCompleted', handleTestComplete);
     };
   }, [testCount]);
+
+  // If user is not logged in and not on an auth page, redirect to login
+  useEffect(() => {
+    const authPages = ['/login', '/signup', '/forgot-password'];
+    const currentPath = location.pathname;
+    
+    if (!user && !authPages.includes(currentPath)) {
+      // Don't redirect when on auth pages to prevent loops
+      if (!currentPath.startsWith('/login') && 
+          !currentPath.startsWith('/signup') && 
+          !currentPath.startsWith('/forgot-password')) {
+        // This is just a fallback - the ProtectedRoute component handles this primarily
+        // navigate('/login', { state: { from: location } });
+      }
+    }
+  }, [user, location]);
 
   const navItems = [
     { label: "Home", href: "/" },
@@ -225,6 +245,21 @@ export function Header() {
                     </DropdownMenuItem>
                   </motion.div>
                   
+                  {/* Word Practice */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: 0.125 }}
+                  >
+                    <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer text-foreground hover:text-foreground hover:bg-background/50" onClick={() => window.location.hash = "#/word-practice"}>
+                      <Type className="h-4 w-4 text-yellow-500" />
+                      <div>
+                        <div className="font-medium">Word Practice</div>
+                        <div className="text-xs text-foreground/80">Master common and difficult words</div>
+                      </div>
+                    </DropdownMenuItem>
+                  </motion.div>
+                  
                   {/* Multiplayer */}
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
@@ -275,15 +310,84 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
             
-            <NavLink to="/stats" active={location.pathname === "/stats"} icon={<BarChart2 className="h-4 w-4" />}>
-              Statistics
-            </NavLink>
-            <NavLink to="/leaderboard" active={location.pathname === "/leaderboard"} icon={<Trophy className="h-4 w-4" />}>
-              Leaderboard
-            </NavLink>
-            <NavLink to="/achievements" active={location.pathname === "/achievements"} icon={<Award className="h-4 w-4" />}>
-              Achievements
-            </NavLink>
+            {/* Progress Dropdown Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost"
+                  className={cn(
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-full transition-all duration-300 h-auto relative group",
+                    (location.pathname === "/stats" || location.pathname === "/leaderboard" || location.pathname === "/achievements") 
+                      ? "bg-background/50 text-primary font-semibold text-shadow-sm" 
+                      : "hover:bg-background/30 hover:text-primary text-foreground font-medium"
+                  )}
+                >
+                  <span className={cn(
+                    "mr-2 transition-transform duration-300 group-hover:scale-110",
+                    (location.pathname === "/stats" || location.pathname === "/leaderboard" || location.pathname === "/achievements")
+                      ? "text-primary"
+                      : "text-primary/80 group-hover:text-primary"
+                  )}>
+                    <BarChart2 className="h-4 w-4" />
+                  </span>
+                  <span className="text-shadow-sm">Progress</span>
+                  <ChevronDown className="h-3 w-3 ml-1 opacity-70 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="center" 
+                className="w-56 backdrop-blur-lg bg-background/70 border-border/50 shadow-md rounded-xl overflow-hidden"
+                sideOffset={5}
+              >
+                <div className="py-1 overflow-hidden">
+                  {/* Statistics */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: 0.05 }}
+                  >
+                    <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer text-foreground hover:text-foreground hover:bg-background/50" onClick={() => window.location.hash = "#/stats"}>
+                      <BarChart2 className="h-4 w-4 text-blue-500" />
+                      <div>
+                        <div className="font-medium">Statistics</div>
+                        <div className="text-xs text-foreground/80">Track your typing performance</div>
+                      </div>
+                    </DropdownMenuItem>
+                  </motion.div>
+                  
+                  {/* Leaderboard */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: 0.1 }}
+                  >
+                    <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer text-foreground hover:text-foreground hover:bg-background/50" onClick={() => window.location.hash = "#/leaderboard"}>
+                      <Trophy className="h-4 w-4 text-yellow-500" />
+                      <div>
+                        <div className="font-medium">Leaderboard</div>
+                        <div className="text-xs text-foreground/80">Compare with other typists</div>
+                      </div>
+                    </DropdownMenuItem>
+                  </motion.div>
+                  
+                  {/* Achievements */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: 0.15 }}
+                  >
+                    <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer text-foreground hover:text-foreground hover:bg-background/50" onClick={() => window.location.hash = "#/achievements"}>
+                      <Award className="h-4 w-4 text-green-500" />
+                      <div>
+                        <div className="font-medium">Achievements</div>
+                        <div className="text-xs text-foreground/80">Unlock rewards and badges</div>
+                      </div>
+                    </DropdownMenuItem>
+                  </motion.div>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
             <div className="h-5 w-px bg-border/30 mx-1"></div>
             <NavLink to="/profile" active={location.pathname === "/profile"} icon={<User className="h-4 w-4" />}>
               Profile
@@ -358,6 +462,15 @@ export function Header() {
                     variant="outline"
                     size="sm"
                     className="flex items-center justify-start gap-2 h-auto py-2 text-foreground border-border/30 bg-background/60 backdrop-blur-sm rounded-xl hover:bg-background/70"
+                    onClick={() => window.location.hash = "#/word-practice"}
+                  >
+                    <Type className="h-4 w-4 text-yellow-500" />
+                    <span>Word Practice</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center justify-start gap-2 h-auto py-2 text-foreground border-border/30 bg-background/60 backdrop-blur-sm rounded-xl hover:bg-background/70"
                     onClick={() => window.location.hash = "#/multiplayer"}
                   >
                     <UsersRound className="h-4 w-4 text-green-500" />
@@ -391,15 +504,43 @@ export function Header() {
                 </div>
               </div>
               
-              <MobileNavLink to="/stats" active={location.pathname === "/stats"} icon={<BarChart2 className="h-5 w-5" />}>
-                Statistics
-              </MobileNavLink>
-              <MobileNavLink to="/leaderboard" active={location.pathname === "/leaderboard"} icon={<Trophy className="h-5 w-5" />}>
-                Leaderboard
-              </MobileNavLink>
-              <MobileNavLink to="/achievements" active={location.pathname === "/achievements"} icon={<Award className="h-5 w-5" />}>
-                Achievements
-              </MobileNavLink>
+              {/* Progress Options Group */}
+              <div className="px-4 py-2 bg-background/20 mx-2 my-2 rounded-xl">
+                <div className="flex items-center text-sm font-medium text-foreground mb-2">
+                  <BarChart2 className="h-4 w-4 mr-2 text-blue-500" />
+                  <span>Progress & Stats</span>
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center justify-start gap-2 h-auto py-2 text-foreground border-border/30 bg-background/60 backdrop-blur-sm rounded-xl hover:bg-background/70"
+                    onClick={() => window.location.hash = "#/stats"}
+                  >
+                    <BarChart2 className="h-4 w-4 text-blue-500" />
+                    <span>Statistics</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center justify-start gap-2 h-auto py-2 text-foreground border-border/30 bg-background/60 backdrop-blur-sm rounded-xl hover:bg-background/70"
+                    onClick={() => window.location.hash = "#/leaderboard"}
+                  >
+                    <Trophy className="h-4 w-4 text-yellow-500" />
+                    <span>Leaderboard</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center justify-start gap-2 h-auto py-2 text-foreground border-border/30 bg-background/60 backdrop-blur-sm rounded-xl hover:bg-background/70"
+                    onClick={() => window.location.hash = "#/achievements"}
+                  >
+                    <Award className="h-4 w-4 text-green-500" />
+                    <span>Achievements</span>
+                  </Button>
+                </div>
+              </div>
+              
               <div className="border-t border-border/20 my-2"></div>
               <MobileNavLink to="/profile" active={location.pathname === "/profile"} icon={<User className="h-5 w-5" />}>
                 Profile

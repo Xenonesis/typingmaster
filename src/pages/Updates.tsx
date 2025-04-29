@@ -37,17 +37,17 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 // Define repository stats
 const repoStats = {
   // Update stats to reflect recent changes
-  commits: 842,
-  contributors: 13,
-  stars: 254,
-  forks: 95,
-  openIssues: 4,
-  closedIssues: 135,
+  commits: 887,
+  contributors: 14,
+  stars: 273,
+  forks: 102,
+  openIssues: 2,
+  closedIssues: 141,
   lastUpdated: new Date().toLocaleDateString(),
   // Add additional stats to highlight recent activity
-  recentCommits: 74,
-  commitsThisWeek: 32,
-  totalUpdates: 12,
+  recentCommits: 86,
+  commitsThisWeek: 45,
+  totalUpdates: 13,
   activeDevelopment: true,
   repositoryUrl: "https://github.com/Xenonesis/speed-typist-challenge",
   mainBranch: "main"
@@ -64,8 +64,65 @@ const languageData = [
 // Define the version history data
 const versionHistory = [
   {
-    version: "7.4",
+    version: "7.5",
     releaseDate: new Date().toLocaleDateString(),
+    title: "Word Practice & Accessibility Improvements",
+    description: "Major update adding a dedicated Word Practice page with adaptive learning features and improved dark mode accessibility.",
+    changes: [
+      {
+        type: "feature",
+        icon: <BookOpen className="h-4 w-4" />,
+        items: [
+          "Added new Word Practice page for focused word-by-word typing practice",
+          "Implemented four difficulty levels: Short, Medium, Long, and Challenging words",
+          "Added adaptive difficulty system that adjusts based on user performance",
+          "Implemented spaced repetition learning system for problematic words",
+          "Created personal word list feature for custom practice sessions",
+          "Added audio feedback system for immediate typing response",
+          "Implemented detailed word practice results with accuracy tracking"
+        ]
+      },
+      {
+        type: "ui",
+        icon: <Palette className="h-4 w-4" />,
+        items: [
+          "Improved dark mode contrast for better text visibility while typing",
+          "Enhanced input field styling with proper contrast ratios",
+          "Optimized navigation bar organization by combining related items",
+          "Added Progress dropdown menu for better navigation structure",
+          "Improved mobile navigation with better organization of options",
+          "Enhanced word display with proper color contrast in dark mode",
+          "Added visual indicators for correct and incorrect words during practice"
+        ]
+      },
+      {
+        type: "code",
+        icon: <Github className="h-4 w-4" />,
+        items: [
+          "Updated GitHub repository with version 7.5 tag",
+          "Enhanced data persistence with localStorage for user preferences",
+          "Implemented proper state management for practice sessions",
+          "Added performance tracking for adaptive difficulty adjustments",
+          "Updated main branch with all new features and improvements",
+          "Enhanced component reusability across practice types"
+        ]
+      },
+      {
+        type: "performance",
+        icon: <Zap className="h-4 w-4" />,
+        items: [
+          "Optimized word generation algorithms for faster loading",
+          "Implemented efficient spaced repetition calculation",
+          "Enhanced response time for typing feedback",
+          "Reduced unnecessary re-renders in practice components",
+          "Improved audio feedback performance with optimized sound files"
+        ]
+      }
+    ]
+  },
+  {
+    version: "7.4",
+    releaseDate: new Date("2025-07-10").toLocaleDateString(),
     title: "Performance & Collaboration Enhancement Update",
     description: "Major update focusing on performance optimization and enhanced collaborative features for a better multiplayer experience.",
     changes: [

@@ -25,30 +25,33 @@ import {
   Globe,
   RefreshCw,
   Search,
-  Filter
+  Filter,
+  FilterX,
+  Circle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Map of icon names to Lucide React components
 const iconMap: Record<string, React.ReactNode> = {
-  'trophy': <Trophy className="h-5 w-5" />,
-  'target': <Target className="h-5 w-5" />,
-  'zap': <Zap className="h-5 w-5" />,
-  'flame': <Flame className="h-5 w-5" />,
-  'award': <Award className="h-5 w-5" />,
-  'keyboard': <Keyboard className="h-5 w-5" />,
-  'medal': <Medal className="h-5 w-5" />,
-  'clock': <Clock className="h-5 w-5" />,
-  'code': <Code className="h-5 w-5" />,
-  'check-circle': <CheckCircle className="h-5 w-5" />,
-  'calendar': <Calendar className="h-5 w-5" />,
-  'globe': <Globe className="h-5 w-5" />
+  'trophy': <Trophy className="h-5 w-5 text-primary/80" />,
+  'target': <Target className="h-5 w-5 text-primary/80" />,
+  'zap': <Zap className="h-5 w-5 text-primary/80" />,
+  'flame': <Flame className="h-5 w-5 text-primary/80" />,
+  'award': <Award className="h-5 w-5 text-primary/80" />,
+  'keyboard': <Keyboard className="h-5 w-5 text-primary/80" />,
+  'medal': <Medal className="h-5 w-5 text-primary/80" />,
+  'clock': <Clock className="h-5 w-5 text-primary/80" />,
+  'code': <Code className="h-5 w-5 text-primary/80" />,
+  'check-circle': <CheckCircle className="h-5 w-5 text-primary/80" />,
+  'calendar': <Calendar className="h-5 w-5 text-primary/80" />,
+  'globe': <Globe className="h-5 w-5 text-primary/80" />
 };
 
 export default function Achievements() {
-  const { achievements, refreshAchievements } = useAchievements();
+  const { achievements, refreshAchievements, isLoading } = useAchievements();
   const { animationsEnabled } = useAnimations();
   const [completedCount, setCompletedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
@@ -61,12 +64,8 @@ export default function Achievements() {
   const categories = useMemo(() => {
     return Array.from(new Set(
       achievements.map(a => {
-        const parts = a.id.split('_');
-        if (parts.length > 1) {
-          if (parts[0] === 'daily') return 'streak';
-          return parts[0];
-        }
-        return 'misc';
+        const category = a.category || 'misc';
+        return category;
       })
     )).sort();
   }, [achievements]);
@@ -103,40 +102,32 @@ export default function Achievements() {
 
   // Filter and search achievements
   const filteredAchievements = useMemo(() => {
-    let filtered = achievements;
+    // Update counts for progress display
+    const completed = achievements.filter(a => a.completed).length;
+    setCompletedCount(completed);
+    setTotalCount(achievements.length);
     
-    // Apply category filter
-    if (selectedCategory) {
-      filtered = filtered.filter(a => {
-        const parts = a.id.split('_');
-        const category = parts.length > 1 ? (parts[0] === 'daily' ? 'streak' : parts[0]) : 'misc';
-        return category === selectedCategory;
-      });
-    }
-    
-    // Apply tab filter
-    if (activeTab === "completed") {
-      filtered = filtered.filter(a => a.completed);
-    } else if (activeTab === "incomplete") {
-      filtered = filtered.filter(a => !a.completed);
-    }
-    
-    // Apply search filter
-    if (searchQuery.trim()) {
+    // Apply filters
+    return achievements.filter(achievement => {
+      // Filter by tab (completion status)
+      if (activeTab === "completed" && !achievement.completed) return false;
+      if (activeTab === "inprogress" && achievement.completed) return false;
+
+      // Filter by category if one is selected
+      if (selectedCategory && achievement.category !== selectedCategory) return false;
+
+      // Filter by search query
+      if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(a => 
-        a.name.toLowerCase().includes(query) || 
-        a.description.toLowerCase().includes(query)
+        return (
+          achievement.name.toLowerCase().includes(query) ||
+          achievement.description.toLowerCase().includes(query)
       );
     }
     
-    return filtered;
-  }, [achievements, selectedCategory, activeTab, searchQuery]);
-
-  useEffect(() => {
-    setCompletedCount(achievements.filter(a => a.completed).length);
-    setTotalCount(achievements.length);
-  }, [achievements]);
+      return true;
+    });
+  }, [achievements, activeTab, selectedCategory, searchQuery]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -176,14 +167,26 @@ export default function Achievements() {
                     size="sm" 
                     className="flex items-center gap-1 self-end sm:self-auto"
                     onClick={refreshAchievements}
+                    disabled={isLoading}
                   >
-                    <RefreshCw className="h-4 w-4" />
+                    <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
                     <span className="hidden sm:inline">Update Missions</span>
                     <span className="sm:hidden">Update</span>
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
+                {isLoading ? (
+                  <div className="space-y-4">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-2.5 w-full" />
+                    <div className="grid grid-cols-2 gap-3">
+                      <Skeleton className="h-20 w-full" />
+                      <Skeleton className="h-20 w-full" />
+                    </div>
+                  </div>
+                ) : (
+                  <>
                 <div className="mb-4">
                   <div className="flex justify-between mb-2">
                     <span className="text-sm font-medium">Completed</span>
@@ -201,6 +204,8 @@ export default function Achievements() {
                     <p className="text-sm font-medium">Remaining Challenges</p>
                   </div>
                 </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -229,10 +234,10 @@ export default function Achievements() {
               onValueChange={setActiveTab}
               className="w-full sm:w-auto"
             >
-              <TabsList className="grid grid-cols-3 w-full h-9">
-                <TabsTrigger value="all" className="text-xs h-7 px-3">All</TabsTrigger>
-                <TabsTrigger value="completed" className="text-xs h-7 px-3">Completed</TabsTrigger>
-                <TabsTrigger value="incomplete" className="text-xs h-7 px-3">Incomplete</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 mb-6">
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="completed">Completed</TabsTrigger>
+                <TabsTrigger value="inprogress">In Progress</TabsTrigger>
               </TabsList>
             </Tabs>
             
@@ -242,7 +247,7 @@ export default function Achievements() {
               className={cn("h-9 w-9", showCategoryFilter && "bg-accent/30")}
               onClick={() => setShowCategoryFilter(!showCategoryFilter)}
             >
-              <Filter className="h-4 w-4" />
+              {showCategoryFilter ? <FilterX className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
             </Button>
           </div>
         </motion.div>
@@ -314,12 +319,12 @@ export default function Achievements() {
                       Complete typing tests to earn achievements. Keep practicing to unlock your first achievement!
                     </p>
                   </>
-                ) : activeTab === "incomplete" ? (
+                ) : activeTab === "inprogress" ? (
                   <>
-                    <CheckCircle className="h-12 w-12 text-primary/80 mx-auto mb-4" />
-                    <h3 className="text-xl font-medium mb-2">All Achievements Completed!</h3>
+                    <Circle className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+                    <h3 className="text-xl font-medium mb-2">No In-Progress Achievements</h3>
                     <p className="text-muted-foreground max-w-md mx-auto text-sm md:text-base">
-                      Congratulations! You've unlocked all available achievements. Check back later for new challenges.
+                      All achievements are either completed or not started yet.
                     </p>
                   </>
                 ) : (
@@ -350,6 +355,7 @@ type AchievementCardProps = {
     icon: string;
     requirement: number;
     progress: number;
+    completed_at?: string | null;
   };
 };
 
@@ -391,6 +397,11 @@ function AchievementCard({ achievement }: AchievementCardProps) {
             className="h-2" 
             indicatorClassName={achievement.completed ? "bg-primary" : ""}
           />
+          {achievement.completed && achievement.completed_at && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Completed on {new Date(achievement.completed_at).toLocaleDateString()}
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>

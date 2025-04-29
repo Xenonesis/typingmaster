@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/date";
 import { useAuth } from "@/context/AuthContext";
 import { saveTypingStats } from "@/services/userService";
+import { useAchievements } from "@/context/AchievementsContext";
 
 export interface TestResultsData {
   wpm: number;
@@ -29,6 +30,7 @@ interface TestResultsProps {
 
 export function TestResults({ results, onRestart, isFullscreen, onExitFullscreen }: TestResultsProps) {
   const { user } = useAuth();
+  const { updateProgress } = useAchievements();
   const [isCopied, setIsCopied] = useState(false);
   const [showScoreAnimation, setShowScoreAnimation] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
@@ -75,9 +77,110 @@ export function TestResults({ results, onRestart, isFullscreen, onExitFullscreen
         
         // Save results to Supabase if user is logged in
         saveResultsToDatabase();
+
+        // Update achievements
+        updateAchievements();
       }, 500);
     }
   }, [results]);
+  
+  // Update achievements based on test results
+  const updateAchievements = () => {
+    if (!results) return;
+    
+    try {
+      // Get stored results to count total tests
+      const storedResultsJSON = localStorage.getItem("typingPersonalBests");
+      const storedResults: TestResultsData[] = storedResultsJSON 
+        ? JSON.parse(storedResultsJSON)
+        : [];
+      
+      // Test completion achievements
+      const totalTests = storedResults.length;
+      updateProgress('tests_completed_10', totalTests);
+      updateProgress('tests_completed_50', totalTests);
+      updateProgress('tests_completed_100', totalTests);
+      updateProgress('tests_completed_500', totalTests);
+      updateProgress('tests_completed_1000', totalTests);
+      
+      // Speed achievements
+      if (results.wpm > 0) {
+        updateProgress('wpm_40', results.wpm);
+        updateProgress('wpm_70', results.wpm);
+        updateProgress('wpm_100', results.wpm);
+        updateProgress('wpm_120', results.wpm);
+        updateProgress('wpm_150', results.wpm);
+        updateProgress('wpm_180', results.wpm);
+        updateProgress('wpm_200', results.wpm);
+      }
+      
+      // Accuracy achievements
+      if (results.accuracy > 0) {
+        updateProgress('accuracy_95', results.accuracy);
+        updateProgress('accuracy_98', results.accuracy);
+        updateProgress('accuracy_100', results.accuracy);
+        
+        // Perfect accuracy at 100+ WPM
+        if (results.accuracy === 100 && results.wpm >= 100) {
+          updateProgress('accuracy_100_wpm_100', 1);
+        }
+      }
+      
+      // Difficulty achievements
+      if (results.difficulty === 'advanced') {
+        updateProgress('advanced_tests_10', 1);
+      } else if (results.difficulty === 'expert') {
+        updateProgress('expert_tests_5', 1);
+      } else if (results.difficulty === 'master') {
+        updateProgress('master_tests_3', 1);
+      }
+      
+      // Code typing achievements
+      if (results.difficulty === 'code') {
+        updateProgress('code_tests_10', 1);
+        updateProgress('code_tests_50', 1);
+        
+        if (results.wpm > 0) {
+          updateProgress('code_wpm_60', results.wpm);
+          updateProgress('code_wpm_80', results.wpm);
+          updateProgress('code_wpm_100', results.wpm);
+        }
+      }
+      
+      // Time-based achievements
+      if (results.time >= 300) { // 5+ minute test
+        updateProgress('long_test_completed', 1);
+      }
+      if (results.time >= 600) { // 10+ minute test
+        updateProgress('marathon_typer', 1);
+      }
+      if (results.time >= 1200) { // 20+ minute test
+        updateProgress('ultra_marathon', 1);
+      }
+      
+      // Special modes
+      if (results.difficulty === 'words') {
+        updateProgress('wordplay_master', 1);
+      } else if (results.difficulty === 'quotes') {
+        updateProgress('quote_enthusiast', 1);
+      }
+      
+      // Time of day achievements (Night Owl: midnight to 5am)
+      const currentHour = new Date().getHours();
+      if (currentHour >= 0 && currentHour < 5) {
+        updateProgress('night_owl', 1);
+      }
+      
+      // Weekend warrior
+      const currentDay = new Date().getDay();
+      if (currentDay === 0 || currentDay === 6) { // 0 = Sunday, 6 = Saturday
+        updateProgress('weekend_warrior', 1);
+      }
+      
+    } catch (error) {
+      console.error("Error updating achievements:", error);
+    }
+  };
 
   // Save results to Supabase if user is logged in
   const saveResultsToDatabase = async () => {
@@ -143,7 +246,7 @@ export function TestResults({ results, onRestart, isFullscreen, onExitFullscreen
   
   // Get difficulty multiplier based on difficulty level
   function getDifficultyMultiplier(difficulty: string): number {
-    switch(difficulty) {
+    switch (difficulty.toLowerCase()) {
       case 'beginner': return 0.8;
       case 'intermediate': return 1.0;
       case 'advanced': return 1.2;
@@ -156,31 +259,27 @@ export function TestResults({ results, onRestart, isFullscreen, onExitFullscreen
   // Get letter grade based on score
   function getGrade(score: number): string {
     if (score >= 200) return "S+";
-    if (score >= 180) return "S";
-    if (score >= 160) return "A+";
-    if (score >= 140) return "A";
-    if (score >= 120) return "B+";
-    if (score >= 100) return "B";
-    if (score >= 80) return "C+";
-    if (score >= 60) return "C";
-    if (score >= 40) return "D";
+    if (score >= 175) return "S";
+    if (score >= 150) return "A+";
+    if (score >= 125) return "A";
+    if (score >= 100) return "B+";
+    if (score >= 80) return "B";
+    if (score >= 60) return "C+";
+    if (score >= 40) return "C";
+    if (score >= 30) return "D";
     return "F";
   }
 
   // Get color class based on grade
   function getGradeColor(grade: string): string {
-    switch(grade) {
-      case "S+": return "text-purple-500 dark:text-purple-300";
-      case "S": return "text-indigo-500 dark:text-indigo-300";
-      case "A+":
-      case "A": return "text-green-500 dark:text-green-300";
-      case "B+":
-      case "B": return "text-blue-500 dark:text-blue-300";
-      case "C+":
-      case "C": return "text-orange-500 dark:text-orange-300";
-      case "D": return "text-amber-500 dark:text-amber-300";
-      case "F": return "text-red-500 dark:text-red-300";
-      default: return "text-foreground";
+    switch (grade[0]) {
+      case 'S': return 'text-purple-500 dark:text-purple-400';
+      case 'A': return 'text-green-500 dark:text-green-400';
+      case 'B': return 'text-blue-500 dark:text-blue-400';
+      case 'C': return 'text-yellow-500 dark:text-yellow-400';
+      case 'D': return 'text-orange-500 dark:text-orange-400';
+      case 'F': return 'text-red-500 dark:text-red-400';
+      default: return '';
     }
   }
 
@@ -233,85 +332,101 @@ export function TestResults({ results, onRestart, isFullscreen, onExitFullscreen
   const gradeColor = getGradeColor(grade);
 
   return (
-    <div className="results-container p-6 space-y-6 max-w-3xl mx-auto">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center space-x-2">
-          <Trophy className="h-5 w-5 text-primary" />
-          <h2 className="text-2xl font-bold">Test Results</h2>
-        </div>
-        <div className="flex items-center space-x-2">
+    <div className="relative w-full max-w-5xl mx-auto">
+      {/* Fullscreen Controls */}
           {isFullscreen && onExitFullscreen && (
-            <Button variant="outline" size="sm" onClick={onExitFullscreen}>
-              <Minimize2 className="h-4 w-4 mr-2" />
-              Exit Fullscreen
-            </Button>
-          )}
-          <Button variant="outline" size="sm" onClick={handleShareResults}>
-            {isCopied ? <Check className="h-4 w-4 mr-2" /> : <Share2 className="h-4 w-4 mr-2" />}
-            {isCopied ? "Copied!" : "Share"}
-          </Button>
-          <Button variant="default" size="sm" onClick={onRestart}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            New Test
+        <div className="absolute top-2 right-2 z-10">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onExitFullscreen}
+            className="bg-background/80 hover:bg-background/90 transition-colors p-1 h-8 w-8"
+          >
+            <Minimize2 className="h-4 w-4" />
           </Button>
         </div>
+      )}
+      
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold mb-2">Test Complete!</h1>
+        <p className="text-muted-foreground">
+          {formatDate(new Date(results.date))}
+        </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Score Card */}
-        <Card className="shadow-card border-border/30 overflow-hidden md:col-span-3">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex justify-between items-center">
-              <span>Final Score</span>
-              {isNewPersonalBest && (
-                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-                  New Personal Best!
-                </Badge>
-              )}
-            </CardTitle>
-            <CardDescription>Based on speed, accuracy, and difficulty</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center justify-center py-6">
+      <div className="space-y-4">
+        {/* Score Animation */}
+        <div className="relative h-32 mb-8">
               <AnimatePresence>
                 {showScoreAnimation && (
                   <motion.div
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="flex items-center justify-center"
+                key="score"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 300, 
+                  damping: 20, 
+                  delay: 0.2 
+                }}
+                className="absolute inset-0 flex flex-col items-center justify-center"
                   >
-                    <div className="relative">
+                <div className="flex items-center justify-center gap-3">
+                  <Trophy className="h-8 w-8 text-yellow-500" />
+                  <div className="flex items-baseline">
+                    <span className="text-5xl md:text-6xl font-bold">{finalScore}</span>
+                    <span className="text-xl md:text-2xl ml-2">points</span>
+                  </div>
+                  <Trophy className="h-8 w-8 text-yellow-500" />
+                </div>
+                
+                <div className="flex items-center mt-2">
                       <motion.div 
-                        className={cn("text-7xl font-bold", gradeColor)}
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.2, type: "spring" }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
                       >
-                        {finalScore}
-                      </motion.div>
-                      
-                      <motion.div 
-                        className="absolute -top-4 -right-4 bg-background border border-border/50 rounded-full px-2 py-1 text-sm font-bold"
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.5, type: "spring" }}
-                      >
-                        <span className={gradeColor}>{grade}</span>
-                      </motion.div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-muted-foreground mr-1">Grade:</span>
+                      <span className={`text-2xl font-bold ${gradeColor}`}>{grade}</span>
                     </div>
                   </motion.div>
-                )}
-              </AnimatePresence>
               
               {personalBest !== null && (
-                <div className="text-sm text-muted-foreground mt-2">
-                  {isNewPersonalBest 
-                    ? `Previous best: ${personalBest}` 
-                    : `Personal best: ${personalBest}`}
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.9 }}
+                      className="ml-6 flex items-center gap-1.5"
+                    >
+                      <span className="text-sm font-medium text-muted-foreground">Best:</span>
+                      <span className="font-medium">{personalBest}</span>
+                      {isNewPersonalBest && (
+                        <Badge
+                          variant="outline"
+                          className="ml-2 bg-green-500/10 text-green-500 border-green-500/20"
+                        >
+                          New Best!
+                        </Badge>
+                      )}
+                    </motion.div>
+                  )}
                 </div>
+              </motion.div>
               )}
+          </AnimatePresence>
             </div>
             
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="shadow-card border-border/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-primary" />
+              Performance Score
+            </CardTitle>
+            <CardDescription>Your typing performance summary</CardDescription>
+          </CardHeader>
+          <CardContent>
             <div className="mt-4 space-y-4">
               <div className="space-y-1">
                 <div className="flex justify-between text-sm">
@@ -382,29 +497,57 @@ export function TestResults({ results, onRestart, isFullscreen, onExitFullscreen
             </div>
           </CardContent>
         </Card>
+        </div>
         
-        <Card className="shadow-card border-border/30">
-          <CardHeader className="pb-2">
-            <CardTitle>Time</CardTitle>
-            <CardDescription>Test duration</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-baseline justify-center">
-              <span className="text-5xl font-bold">{results.time}</span>
-              <span className="text-xl ml-1">s</span>
-            </div>
-            <div className="text-center text-sm text-muted-foreground mt-1">
-              {formatDate(new Date(results.date))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col sm:flex-row gap-3 mt-8 justify-center">
+          <Button 
+            onClick={onRestart} 
+            size="lg" 
+            className="gap-2 px-5"
+          >
+            <RefreshCw className="h-4 w-4" />
+            New Test
+          </Button>
+          
+          <Button 
+            onClick={handleShareResults} 
+            variant="outline" 
+            size="lg" 
+            className="gap-2 px-5"
+          >
+            <Share2 className="h-4 w-4" />
+            {isCopied ? "Copied!" : "Share Results"}
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="gap-2 px-5"
+            asChild
+          >
+            <a href="/">
+              <Home className="h-4 w-4" />
+              Home
+            </a>
+          </Button>
       </div>
       
-      <div className="flex justify-center pt-4">
-        <Button variant="default" size="lg" onClick={onRestart}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Take Another Test
-        </Button>
+        {/* Cloud Save Status */}
+        {user && (
+          <div className="text-center text-sm text-muted-foreground mt-4">
+            {isSavingToCloud ? (
+              <div className="flex items-center justify-center gap-2">
+                <RefreshCw className="h-3 w-3 animate-spin" />
+                Saving results to your profile...
+              </div>
+            ) : savedToCloud ? (
+              <div className="flex items-center justify-center gap-2">
+                <Check className="h-3 w-3 text-green-500" />
+                Results saved to your profile
+              </div>
+            ) : null}
+          </div>
+        )}
       </div>
     </div>
   );

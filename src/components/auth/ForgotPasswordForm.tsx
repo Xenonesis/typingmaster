@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,9 +11,14 @@ export function ForgotPasswordForm() {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const { resetPassword } = useAuth();
+  const { resetPassword, clearAuthData } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Clear auth data on component mount
+  useEffect(() => {
+    clearAuthData();
+  }, [clearAuthData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +35,9 @@ export function ForgotPasswordForm() {
     setIsLoading(true);
     
     try {
+      // Clear auth data before password reset
+      clearAuthData();
+      
       const { error } = await resetPassword(email);
       
       if (error) {
@@ -44,6 +52,9 @@ export function ForgotPasswordForm() {
           title: "Reset email sent",
           description: "Check your email for the reset link.",
         });
+        
+        // Clear auth data after successful reset request
+        clearAuthData();
       }
     } catch (err) {
       toast({

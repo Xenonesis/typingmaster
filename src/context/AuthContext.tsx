@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { supabase, customSignIn, customResetPassword, clearSupabaseData } from '@/lib/supabase';
 
 type AuthContextType = {
   user: User | null;
@@ -11,6 +11,7 @@ type AuthContextType = {
   signUp: (email: string, password: string) => Promise<{ error: AuthError | null; user: User | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
+  clearAuthData: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +23,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<AuthError | null>(null);
 
   useEffect(() => {
+    // Clear any existing redirects on app load
+    clearSupabaseData();
+    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -32,6 +36,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
+        // Clear any potential redirect URL to prevent unwanted redirects
+        clearSupabaseData();
+        
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -44,12 +51,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setError(error);
+    // Use our custom sign-in function that prevents redirects
+    const { data, error } = await customSignIn(email, password);
+    
+    if (!error) {
+      setSession(data.session);
+      setUser(data.user);
+    } else {
+      setError(error);
+    }
+    
     return { error };
   };
 
   const signUp = async (email: string, password: string) => {
+    // Clear any existing auth data first
+    clearSupabaseData();
+    
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) setError(error);
     return { error, user: data.user };
@@ -57,14 +75,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    clearSupabaseData();
   };
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    // Use custom reset password function with no redirects
+    const { error } = await customResetPassword(email);
+    
     if (error) setError(error);
     return { error };
+  };
+  
+  // Expose function to clear auth data directly
+  const clearAuthData = () => {
+    clearSupabaseData();
   };
 
   const value = {
@@ -76,6 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signUp,
     signOut,
     resetPassword,
+    clearAuthData,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

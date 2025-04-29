@@ -176,14 +176,146 @@ export async function getTypingStats(userId: string, limit = 100) {
  * Get leaderboard data (highest WPM)
  */
 export async function getLeaderboard(limit = 20) {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id, user_id, username, full_name, avatar_url, best_wpm, total_tests')
-    .order('best_wpm', { ascending: false })
-    .limit(limit);
+  try {
+    // First try to get from profiles table (validated data)
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, user_id, username, full_name, avatar_url, best_wpm, total_tests, updated_at')
+      .order('best_wpm', { ascending: false })
+      .limit(limit);
+      
+    if (profileError) {
+      console.error('Error fetching leaderboard from profiles:', profileError);
+      throw profileError;
+    }
     
-  if (error) throw error;
-  return data;
+    // Enhance with recent activity data
+    const enhancedLeaderboard = await Promise.all(
+      profileData.map(async (profile) => {
+        try {
+          // Get the user's most recent test date
+          const { data: recentTest, error: recentError } = await supabase
+            .from('typing_stats')
+            .select('date')
+            .eq('user_id', profile.user_id)
+            .order('date', { ascending: false })
+            .limit(1)
+            .single();
+            
+          return {
+            ...profile,
+            last_active: recentTest?.date || profile.updated_at
+          };
+        } catch (error) {
+          console.warn('Error fetching recent activity for user:', profile.user_id, error);
+          return {
+            ...profile,
+            last_active: profile.updated_at
+          };
+        }
+      })
+    );
+    
+    return enhancedLeaderboard;
+  } catch (error) {
+    console.error('Error in getLeaderboard:', error);
+    // Return empty array as fallback
+    return [];
+  }
+}
+
+/**
+ * Get real-time typing stats for a specific time period
+ */
+export async function getTypingStatsByPeriod(userId: string, period: 'day' | 'week' | 'month' = 'week') {
+  try {
+    // Calculate the start date based on the period
+    const now = new Date();
+    let startDate: Date;
+    
+    switch (period) {
+      case 'day':
+        startDate = new Date(now);
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case 'week':
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() - 7);
+        break;
+      case 'month':
+        startDate = new Date(now);
+        startDate.setMonth(now.getMonth() - 1);
+        break;
+      default:
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() - 7);
+    }
+    
+    const { data, error } = await supabase
+      .from('typing_stats')
+      .select('*')
+      .eq('user_id', userId)
+      .gte('date', startDate.toISOString())
+      .order('date', { ascending: true });
+      
+    if (error) {
+      console.error(`Error fetching typing stats for period ${period}:`, error);
+      throw error;
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error in getTypingStatsByPeriod:', error);
+    return [];
+  }
+}
+
+/**
+ * Get daily leaderboard data (best performances today)
+ */
+export async function getDailyLeaderboard(limit = 10) {
+  try {
+    // Calculate the start of today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Get today's best performances
+    const { data, error } = await supabase
+      .from('typing_stats')
+      .select(`
+        id,
+        wpm,
+        accuracy,
+        test_type,
+        duration,
+        date,
+        profiles(id, user_id, username, avatar_url)
+      `)
+      .gte('date', today.toISOString())
+      .order('wpm', { ascending: false })
+      .limit(limit);
+      
+    if (error) {
+      console.error('Error fetching daily leaderboard:', error);
+      throw error;
+    }
+    
+    // Format the response to a more usable structure
+    return data.map(entry => ({
+      id: entry.id,
+      user_id: entry.profiles?.user_id,
+      username: entry.profiles?.username || 'Anonymous',
+      avatar_url: entry.profiles?.avatar_url,
+      wpm: entry.wpm,
+      accuracy: entry.accuracy,
+      test_type: entry.test_type,
+      duration: entry.duration,
+      date: entry.date
+    }));
+  } catch (error) {
+    console.error('Error in getDailyLeaderboard:', error);
+    return [];
+  }
 }
 
 /**

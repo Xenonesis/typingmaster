@@ -1,5 +1,5 @@
 -- Create profiles table
-CREATE TABLE profiles (
+CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
   username TEXT,
@@ -24,7 +24,7 @@ CREATE TABLE profiles (
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
 -- Create typing_stats table to store user typing test results
-CREATE TABLE typing_stats (
+CREATE TABLE IF NOT EXISTS typing_stats (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   date TIMESTAMP WITH TIME ZONE DEFAULT now(),
@@ -40,6 +40,33 @@ CREATE TABLE typing_stats (
 -- Enable row level security for typing_stats
 ALTER TABLE typing_stats ENABLE ROW LEVEL SECURITY;
 
+-- Create achievements table to store available achievements
+CREATE TABLE IF NOT EXISTS achievements (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  icon TEXT NOT NULL,
+  requirement INTEGER NOT NULL,
+  category TEXT NOT NULL
+);
+
+-- Create user_achievements table to track user achievement progress
+CREATE TABLE IF NOT EXISTS user_achievements (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  achievement_id TEXT REFERENCES achievements(id) ON DELETE CASCADE NOT NULL,
+  progress INTEGER NOT NULL DEFAULT 0,
+  completed BOOLEAN NOT NULL DEFAULT false,
+  completed_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  UNIQUE(user_id, achievement_id)
+);
+
+-- Enable row level security for achievements tables
+ALTER TABLE achievements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_achievements ENABLE ROW LEVEL SECURITY;
+
 -- Create leaderboard view for public leaderboard
 CREATE OR REPLACE VIEW public_leaderboard AS 
 SELECT 
@@ -54,26 +81,61 @@ ORDER BY p.best_wpm DESC;
 -- Create Row Level Security Policies
 
 -- Profiles policies
--- Users can read everyone's profile
+-- Drop policy if it exists (this won't error if it doesn't exist)
+DROP POLICY IF EXISTS "Allow public read access to profiles" ON profiles;
+DROP POLICY IF EXISTS "Allow users to update their own profile" ON profiles;
+DROP POLICY IF EXISTS "Allow users to insert their own profile" ON profiles;
+
+-- Then create it
 CREATE POLICY "Allow public read access to profiles" 
 ON profiles FOR SELECT USING (true);
 
--- Users can only update their own profile
 CREATE POLICY "Allow users to update their own profile" 
 ON profiles FOR UPDATE USING (auth.uid() = user_id);
 
--- Users can insert their own profile
 CREATE POLICY "Allow users to insert their own profile" 
 ON profiles FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Typing stats policies
 -- Users can read their own typing stats
+DROP POLICY IF EXISTS "Allow users to read their own typing stats" ON typing_stats;
+DROP POLICY IF EXISTS "Allow users to insert their own typing stats" ON typing_stats;
+
 CREATE POLICY "Allow users to read their own typing stats" 
 ON typing_stats FOR SELECT USING (auth.uid() = user_id);
 
--- Users can insert their own typing stats
 CREATE POLICY "Allow users to insert their own typing stats" 
 ON typing_stats FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Achievements policies
+-- Everyone can read achievements
+DROP POLICY IF EXISTS "Allow public read access to achievements" ON achievements;
+DROP POLICY IF EXISTS "Allow authenticated users to insert achievements" ON achievements;
+DROP POLICY IF EXISTS "Allow authenticated users to update achievements" ON achievements;
+
+CREATE POLICY "Allow public read access to achievements" 
+ON achievements FOR SELECT USING (true);
+
+CREATE POLICY "Allow authenticated users to insert achievements" 
+ON achievements FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Allow authenticated users to update achievements" 
+ON achievements FOR UPDATE USING (auth.role() = 'authenticated');
+
+-- User achievements policies
+-- Users can read their own achievement progress
+DROP POLICY IF EXISTS "Allow users to read their own achievement progress" ON user_achievements;
+DROP POLICY IF EXISTS "Allow users to insert their own achievement progress" ON user_achievements;
+DROP POLICY IF EXISTS "Allow users to update their own achievement progress" ON user_achievements;
+
+CREATE POLICY "Allow users to read their own achievement progress" 
+ON user_achievements FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Allow users to insert their own achievement progress" 
+ON user_achievements FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Allow users to update their own achievement progress" 
+ON user_achievements FOR UPDATE USING (auth.uid() = user_id);
 
 -- Create custom function to get recent typing stats for a user
 CREATE OR REPLACE FUNCTION get_user_recent_stats(user_uuid UUID, limit_count INTEGER DEFAULT 10)
@@ -148,6 +210,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create the trigger on the typing_stats table
+DROP TRIGGER IF EXISTS update_profile_after_test_insert ON typing_stats;
 CREATE TRIGGER update_profile_after_test_insert
 AFTER INSERT ON typing_stats
 FOR EACH ROW

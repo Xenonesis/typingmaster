@@ -26,6 +26,17 @@ interface TypingStatsContextType {
   trackError: (character: string) => void;
   clearErrorData: () => void;
   hasRealData: boolean;
+  compareWithLeaderboard: (leaderboardData: any[]) => LeaderboardComparison;
+}
+
+// Add a new interface for leaderboard comparison results
+interface LeaderboardComparison {
+  userRank: number;
+  percentile: number;
+  wpmDifferenceToTop: number;
+  wpmDifferenceToAverage: number;
+  improvementNeeded: number;
+  comparisonDate: Date;
 }
 
 // Default values
@@ -262,6 +273,80 @@ export const TypingStatsProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   };
 
+  /**
+   * Compare user's performance with a leaderboard and calculate ranking metrics
+   */
+  const compareWithLeaderboard = (leaderboardData: any[]): LeaderboardComparison => {
+    if (!leaderboardData || leaderboardData.length === 0) {
+      return {
+        userRank: 0,
+        percentile: 0,
+        wpmDifferenceToTop: 0,
+        wpmDifferenceToAverage: 0,
+        improvementNeeded: 0,
+        comparisonDate: new Date()
+      };
+    }
+    
+    // Default comparison object
+    const comparison: LeaderboardComparison = {
+      userRank: leaderboardData.length + 1, // Default to last place
+      percentile: 0,
+      wpmDifferenceToTop: 0,
+      wpmDifferenceToAverage: 0,
+      improvementNeeded: 0,
+      comparisonDate: new Date()
+    };
+    
+    // Extract WPM values from leaderboard and sort them in descending order
+    const leaderboardWpms = leaderboardData
+      .map(entry => typeof entry.best_wpm === 'number' ? entry.best_wpm : 
+                   (typeof entry.wpm === 'number' ? entry.wpm : 0))
+      .filter(wpm => wpm > 0)
+      .sort((a, b) => b - a);
+    
+    if (leaderboardWpms.length === 0) return comparison;
+    
+    // Get the top WPM and calculate average
+    const topWpm = leaderboardWpms[0];
+    const averageWpm = leaderboardWpms.reduce((sum, wpm) => sum + wpm, 0) / leaderboardWpms.length;
+    
+    // User's best WPM from stats
+    const userBestWpm = stats.bestWpm;
+    
+    // Calculate the user's rank and percentile
+    let userRank = leaderboardWpms.findIndex(wpm => userBestWpm >= wpm);
+    if (userRank === -1) {
+      // User's WPM is lower than all entries
+      userRank = leaderboardWpms.length;
+    }
+    // Add 1 because array indices are 0-based
+    userRank += 1;
+    
+    // Calculate percentile (higher is better)
+    const percentile = ((leaderboardWpms.length - userRank + 1) / leaderboardWpms.length) * 100;
+    
+    // Calculate WPM differences
+    const wpmDifferenceToTop = topWpm - userBestWpm;
+    const wpmDifferenceToAverage = userBestWpm - averageWpm;
+    
+    // Calculate improvement needed to reach next rank
+    let improvementNeeded = 0;
+    if (userRank > 1) {
+      const nextRankWpm = leaderboardWpms[userRank - 2]; // -2 because of 0-index and we want the entry above
+      improvementNeeded = nextRankWpm - userBestWpm + 1; // +1 to ensure overtaking
+    }
+    
+    return {
+      userRank,
+      percentile: parseFloat(percentile.toFixed(1)),
+      wpmDifferenceToTop: Math.max(0, Math.round(wpmDifferenceToTop)),
+      wpmDifferenceToAverage: Math.round(wpmDifferenceToAverage),
+      improvementNeeded: Math.max(0, Math.round(improvementNeeded)),
+      comparisonDate: new Date()
+    };
+  };
+
   // Load stats on mount
   useEffect(() => {
     refreshStats();
@@ -285,7 +370,16 @@ export const TypingStatsProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, []);
 
   return (
-    <TypingStatsContext.Provider value={{ stats, refreshStats, trackError, clearErrorData, hasRealData }}>
+    <TypingStatsContext.Provider
+      value={{
+        stats,
+        refreshStats,
+        trackError,
+        clearErrorData,
+        hasRealData,
+        compareWithLeaderboard
+      }}
+    >
       {children}
     </TypingStatsContext.Provider>
   );
