@@ -1,49 +1,38 @@
-# IDE and Editor files
-.qodo
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
 
-# Environment variables
+# Build output
+dist/
+build/
+
+# Development files
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Dependencies
-node_modules/
-/.pnp
-.pnp.js
+# Editor and OS files
+.DS_Store
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
 
-# Build artifacts
-/dist
-/build
-/dist-ssr
-
-# Debug
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-# Testing
-/coverage
-
-# Operating System Files
-.DS_Store
-Thumbs.db
-*.pem
-
-# Typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# Vite
-vite.config.ts.timestamp-*
 
 # Misc
-.vercel
-.netlify
+.cache/
+coverage/
+.npm
+.eslintcache
+
+# Vite generated files
+*.timestamp-*.mjs 
