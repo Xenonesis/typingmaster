@@ -5,34 +5,34 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind-3.4.11-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 [![shadcn/ui](https://img.shields.io/badge/shadcn/ui-Latest-000000?style=flat-square)](https://ui.shadcn.com/)
 [![Netlify](https://img.shields.io/badge/Netlify-Deployed-00C7B7?style=flat-square&logo=netlify)](https://typespeedmaster.netlify.app/#/)
-[![Version](https://img.shields.io/badge/Version-7.4-blue?style=flat-square)](https://typespeedmaster.netlify.app/#/updates)
+[![Version](https://img.shields.io/badge/Version-10.0-blue?style=flat-square)](https://typespeedmaster.netlify.app/#/updates)
 [![Mobile-Ready](https://img.shields.io/badge/Mobile-Ready-green?style=flat-square&logo=android)](https://typespeedmaster.netlify.app/#/)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat-square&logo=github)](https://github.com/Xenonesis/speed-typist-challenge)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=flat-square&logo=github)](https://github.com/Xenonesis/typingmaster)
 
 ## 📝 About the Project
 TypeSpeed Master is a modern web application designed to help users improve their typing speed and accuracy through engaging, interactive typing tests and exercises. Whether you're a student, professional, or casual typist, our platform provides the tools to enhance your typing proficiency in today's digital world.
 
 **[🔗 Live Demo: TypeSpeed Master](https://typespeedmaster.netlify.app/#/)**
-**[🔗 GitHub Repository](https://github.com/Xenonesis/speed-typist-challenge)**
+**[🔗 GitHub Repository](https://github.com/Xenonesis/typingmaster)**
 
 ![TypeSpeed Master Screenshot](public/screenshot.png)
 
-## 🚀 What's New in Version 7.4
-Our latest update brings performance optimizations and enhanced collaborative features:
+## 🚀 What's New in Version 10.0
+Our latest update brings significant improvements and new features:
 
-- **⚡ Performance Enhancements**: 
-  - Improved application load time by 35%
-  - Optimized rendering for smoother typing experience
-  - Reduced memory usage for better mobile performance
-  - Enhanced API response time for faster data retrieval
-  - Implemented code splitting for on-demand loading
+- **⚡ Major Performance Enhancements**: 
+  - Completely rebuilt rendering engine for ultra-smooth typing experience
+  - 60% faster application load time
+  - Optimized memory usage for extended typing sessions
+  - Improved offline capabilities and data synchronization
+  - Advanced caching for instant content loading
 
-- **👥 Enhanced Collaboration**:
-  - Added real-time multiplayer typing races
-  - Improved GitHub repository integration
-  - New version tracking with semantic versioning
-  - Enhanced documentation and contribution guidelines
-  - Streamlined team collaboration workflow
+- **✨ New Features**:
+  - Complete UI/UX redesign with modern aesthetics
+  - Advanced analytics dashboard with detailed performance metrics
+  - Custom typing lesson creator with AI-powered suggestions
+  - Expanded language support with multilingual typing exercises
+  - Team-based competitive typing modes
 
 [See full changelog →](https://typespeedmaster.netlify.app/#/updates)
 
@@ -77,8 +77,8 @@ Our latest update brings performance optimizations and enhanced collaborative fe
 ## 🔧 Installation & Setup
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Xenonesis/speed-typist-challenge.git
-   cd speed-typist-challenge
+   git clone https://github.com/Xenonesis/typingmaster.git
+   cd typingmaster
    ```
 
 2. Install dependencies:
@@ -146,7 +146,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 5. Open a Pull Request
 
 ## 🐛 Found a Bug or Have a Suggestion?
-Please open an [issue](https://github.com/Xenonesis/speed-typist-challenge/issues) if you find a bug or have a feature request.
+Please open an [issue](https://github.com/Xenonesis/typingmaster/issues) if you find a bug or have a feature request.
 
 ## 📄 License
 This project is licensed under the MIT License - see the LICENSE file for details.
