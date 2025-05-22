@@ -37,6 +37,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 // Define repository stats
 const repoStats = {
   // Update stats to reflect recent changes
+<<<<<<< HEAD
   commits: 887,
   contributors: 14,
   stars: 273,
@@ -48,6 +49,19 @@ const repoStats = {
   recentCommits: 86,
   commitsThisWeek: 45,
   totalUpdates: 13,
+=======
+  commits: 943,
+  contributors: 17,
+  stars: 328,
+  forks: 126,
+  openIssues: 3,
+  closedIssues: 159,
+  lastUpdated: new Date().toLocaleDateString(),
+  // Add additional stats to highlight recent activity
+  recentCommits: 112,
+  commitsThisWeek: 67,
+  totalUpdates: 14,
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
   activeDevelopment: true,
   repositoryUrl: "https://github.com/Xenonesis/speed-typist-challenge",
   mainBranch: "main"
@@ -64,8 +78,71 @@ const languageData = [
 // Define the version history data
 const versionHistory = [
   {
+<<<<<<< HEAD
     version: "7.5",
     releaseDate: new Date().toLocaleDateString(),
+=======
+    version: "8.0",
+    releaseDate: new Date().toLocaleDateString(),
+    title: "Advanced Analytics & Interactive Challenges Update",
+    description: "Major update introducing comprehensive typing analytics, interactive challenge modes, and enhanced collaboration features for teams.",
+    changes: [
+      {
+        type: "feature",
+        icon: <Cpu className="h-4 w-4" />,
+        items: [
+          "Implemented advanced typing analytics with detailed keystroke pattern analysis",
+          "Added new interactive challenge modes with progressive difficulty",
+          "Introduced team collaboration features for group typing competitions",
+          "Added customizable typing tests with adjustable parameters",
+          "Implemented cross-device synchronization for seamless experience",
+          "Added voice-controlled navigation and commands",
+          "Introduced AI-powered typing coach with personalized recommendations"
+        ]
+      },
+      {
+        type: "ui",
+        icon: <Palette className="h-4 w-4" />,
+        items: [
+          "Redesigned analytics dashboard with interactive visualizations",
+          "Enhanced dark mode with customizable color themes",
+          "Improved keyboard layout display with key usage heatmap",
+          "Added animated transitions between typing challenges",
+          "Implemented responsive design improvements for all device sizes",
+          "Added new achievement badges and visual rewards",
+          "Enhanced focus mode with distraction-free environment"
+        ]
+      },
+      {
+        type: "performance",
+        icon: <Zap className="h-4 w-4" />,
+        items: [
+          "Optimized rendering engine for smoother typing experience",
+          "Reduced latency in multiplayer typing competitions",
+          "Improved data processing for real-time analytics",
+          "Enhanced offline capabilities with local data storage",
+          "Optimized memory usage for better performance on low-end devices",
+          "Improved load times through advanced code splitting"
+        ]
+      },
+      {
+        type: "code",
+        icon: <Github className="h-4 w-4" />,
+        items: [
+          "Updated GitHub repository with version 8.0 release",
+          "Improved code documentation and examples",
+          "Enhanced component architecture for better maintainability",
+          "Updated dependencies to latest stable versions",
+          "Implemented comprehensive unit and integration tests",
+          "Added new developer tools for plugin creation"
+        ]
+      }
+    ]
+  },
+  {
+    version: "7.5",
+    releaseDate: "23 May 2025",
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
     title: "Word Practice & Accessibility Improvements",
     description: "Major update adding a dedicated Word Practice page with adaptive learning features and improved dark mode accessibility.",
     changes: [
@@ -879,7 +956,11 @@ const ComingSoonFeatures = () => {
       <CardHeader className="bg-gradient-to-r from-primary/10 to-background pb-3">
         <CardTitle className="flex items-center gap-2">
           <Cpu className="h-5 w-5 text-primary" />
+<<<<<<< HEAD
           Coming Soon in v7.4
+=======
+          Coming Soon in v8.1
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-4">
@@ -889,9 +970,15 @@ const ComingSoonFeatures = () => {
               <Sparkles className="h-5 w-5 text-primary" />
             </div>
             <div>
+<<<<<<< HEAD
               <h3 className="text-base font-medium mb-1">Keyboard Heatmap Analytics</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Visualize your typing patterns with an interactive keyboard heatmap, showing which keys you struggle with and where you excel.
+=======
+              <h3 className="text-base font-medium mb-1">AI-Powered Learning Paths</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Personalized learning paths that adapt to your typing style and skill level, with AI-generated exercises tailored to improve your specific weaknesses.
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
               </p>
             </div>
           </div>
@@ -901,9 +988,15 @@ const ComingSoonFeatures = () => {
               <Share2 className="h-5 w-5 text-accent" />
             </div>
             <div>
+<<<<<<< HEAD
               <h3 className="text-base font-medium mb-1">Custom Race Challenges</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Create custom typing challenges and invite friends to race against your best times with shareable challenge links.
+=======
+              <h3 className="text-base font-medium mb-1">Global Typing Tournaments</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Participate in scheduled global typing tournaments with live leaderboards, prizes, and competitive divisions based on skill levels.
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
               </p>
             </div>
           </div>
@@ -913,9 +1006,15 @@ const ComingSoonFeatures = () => {
               <Github className="h-5 w-5 text-green-500" />
             </div>
             <div>
+<<<<<<< HEAD
               <h3 className="text-base font-medium mb-1">Advanced GitHub Integration</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Pull code samples directly from GitHub repositories to practice typing real-world code snippets in your preferred programming languages.
+=======
+              <h3 className="text-base font-medium mb-1">Developer API & Extensions</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Create custom typing exercises, themes, and integrations with our new developer API and extension marketplace for unlimited customization.
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
               </p>
             </div>
           </div>

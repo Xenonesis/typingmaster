@@ -32,7 +32,11 @@ function ProfileContent() {
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const [themePreference, setThemePreference] = useState<string>(() => 
+<<<<<<< HEAD
     localStorage.getItem("typingTheme") || "system"
+=======
+    localStorage.getItem("theme") || "system"
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
   );
   
   // Profile state
@@ -81,7 +85,17 @@ function ProfileContent() {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
       setTheme(systemTheme);
     } else {
+<<<<<<< HEAD
       setTheme(themePreference as "light" | "dark");
+=======
+      // Make sure we only set valid themes
+      const validThemes = ["light", "dark", "ocean", "forest", "sunset", "midnight"];
+      if (validThemes.includes(themePreference)) {
+        setTheme(themePreference as "light" | "dark" | "ocean" | "forest" | "sunset" | "midnight");
+      } else {
+        setTheme("light");
+      }
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
     }
   }, [themePreference, setTheme]);
   
@@ -155,7 +169,11 @@ function ProfileContent() {
       
       syncStats();
     }
+<<<<<<< HEAD
   }, [user]);
+=======
+  }, [user, toast]);
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
 
   // Handle form field changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,14 +203,28 @@ function ProfileContent() {
   // Handle theme preference change
   const handleThemeChange = (value: string) => {
     setThemePreference(value);
+<<<<<<< HEAD
     localStorage.setItem("typingTheme", value);
+=======
+    localStorage.setItem("theme", value);
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
     
     // Apply theme based on preference
     if (value === "system") {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
       setTheme(systemTheme);
     } else {
+<<<<<<< HEAD
       setTheme(value as "light" | "dark");
+=======
+      // Make sure we only set valid themes
+      const validThemes = ["light", "dark", "ocean", "forest", "sunset", "midnight"];
+      if (validThemes.includes(value)) {
+        setTheme(value as "light" | "dark" | "ocean" | "forest" | "sunset" | "midnight");
+      } else {
+        setTheme("light");
+      }
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
     }
   };
   
@@ -400,8 +432,13 @@ function ProfileContent() {
             {/* Main Content */}
             <div className="col-span-1 lg:col-span-8">
               <Card className="shadow-card border-border/30">
+<<<<<<< HEAD
                 <CardHeader className="bg-background/50 pb-2">
                   <Tabs defaultValue="personal" onValueChange={setActiveTab} className="w-full">
+=======
+                <Tabs defaultValue="personal" onValueChange={setActiveTab} className="w-full">
+                  <CardHeader className="bg-background/50 pb-2">
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
                     <TabsList className="w-full">
                       <TabsTrigger value="personal" className="flex items-center gap-1 flex-1">
                         <User className="h-4 w-4" />
@@ -419,6 +456,7 @@ function ProfileContent() {
                         <span className="sm:hidden">Prefs</span>
                       </TabsTrigger>
                     </TabsList>
+<<<<<<< HEAD
                   </Tabs>
                 </CardHeader>
                 
@@ -578,6 +616,167 @@ function ProfileContent() {
                     {loading ? 'Saving...' : 'Save Profile'}
                   </Button>
                 </CardFooter>
+=======
+                  </CardHeader>
+                  
+                  <CardContent className="p-6">
+                    <TabsContent value="personal" className="mt-0 space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          value={user.email || ''}
+                          disabled
+                          className="bg-muted/50"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="username">Username</Label>
+                        <Input
+                          id="username"
+                          name="username"
+                          value={profile.username || ''}
+                          onChange={handleChange}
+                          placeholder="Enter your username"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="full_name">Full Name</Label>
+                        <Input
+                          id="full_name"
+                          name="full_name"
+                          value={profile.full_name || ''}
+                          onChange={handleChange}
+                          placeholder="Enter your full name"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="contact_number">Contact Number</Label>
+                        <Input
+                          id="contact_number"
+                          name="contact_number"
+                          value={profile.contact_number || ''}
+                          onChange={handleChange}
+                          placeholder="Enter your contact number"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label>User Type</Label>
+                        <RadioGroup
+                          value={profile.user_type || 'student'}
+                          onValueChange={handleUserTypeChange}
+                          className="flex space-x-4"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="student" id="student" />
+                            <Label htmlFor="student">Student</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="professional" id="professional" />
+                            <Label htmlFor="professional">Professional</Label>
+                          </div>
+                        </RadioGroup>
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="professional" className="mt-0 space-y-4">
+                      {profile.user_type === 'student' ? (
+                        <>
+                          <div className="space-y-2">
+                            <Label htmlFor="class_name">Class</Label>
+                            <Input
+                              id="class_name"
+                              name="class_name"
+                              value={profile.class_name || ''}
+                              onChange={handleChange}
+                              placeholder="Enter your class"
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="university">University Name</Label>
+                            <Input
+                              id="university"
+                              name="university"
+                              value={profile.university || ''}
+                              onChange={handleChange}
+                              placeholder="Enter your university name"
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="university_address">University Address</Label>
+                            <Input
+                              id="university_address"
+                              name="university_address"
+                              value={profile.university_address || ''}
+                              onChange={handleChange}
+                              placeholder="Enter your university address"
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="space-y-2">
+                            <Label htmlFor="company_name">Company Name</Label>
+                            <Input
+                              id="company_name"
+                              name="company_name"
+                              value={profile.company_name || ''}
+                              onChange={handleChange}
+                              placeholder="Enter your company name"
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="designation">Designation</Label>
+                            <Input
+                              id="designation"
+                              name="designation"
+                              value={profile.designation || ''}
+                              onChange={handleChange}
+                              placeholder="Enter your designation"
+                            />
+                          </div>
+                        </>
+                      )}
+                    </TabsContent>
+                    
+                    <TabsContent value="preferences" className="mt-0 space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="theme">Theme Preference</Label>
+                        <Select
+                          value={themePreference}
+                          onValueChange={handleThemeChange}
+                        >
+                          <SelectTrigger id="theme">
+                            <SelectValue placeholder="Select theme" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="system">System</SelectItem>
+                            <SelectItem value="light">Light</SelectItem>
+                            <SelectItem value="dark">Dark</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </TabsContent>
+                  </CardContent>
+                  
+                  <CardFooter className="px-6 pb-6">
+                    <Button 
+                      onClick={handleSaveProfile} 
+                      disabled={loading}
+                      className="w-full"
+                    >
+                      {loading ? 'Saving...' : 'Save Profile'}
+                    </Button>
+                  </CardFooter>
+                </Tabs>
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
               </Card>
             </div>
           </div>
@@ -595,4 +794,8 @@ export default function Profile() {
       <ProfileContent />
     </ThemeProvider>
   );
+<<<<<<< HEAD
 } 
+=======
+}
+>>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
