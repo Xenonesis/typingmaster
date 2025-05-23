@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { 
   ArrowDown, 
   Keyboard, 
+  Clock,
   Trophy, 
   BarChart2, 
   Github, 
@@ -486,71 +487,396 @@ const HeroSection = memo(({ scrollToTest }: { scrollToTest: () => void }) => {
   );
 });
 
-// Interactive typing preview component
+// Interactive typing preview component with enhanced design and animations
 const TypingPreview = memo(() => {
-  const [text] = useState("The quick brown fox jumps over the lazy dog. Practice your typing to increase speed and accuracy.");
+  const [texts] = useState([
+    {
+      content: "The quick brown fox jumps over the lazy dog. Practice your typing to increase speed and accuracy.",
+      author: "Typing Master Pro",
+      difficulty: 1
+    },
+    {
+      content: "Mastering touch typing can boost your productivity by 20-40%. Start your journey today!",
+      author: "Productivity Expert",
+      difficulty: 2
+    },
+    {
+      content: "Every expert was once a beginner. Your typing speed will improve with regular practice.",
+      author: "Typing Coach",
+      difficulty: 3
+    }
+  ]);
+  
+  const [textIndex, setTextIndex] = useState(0);
   const [currentPosition, setCurrentPosition] = useState(0);
   const [isActive, setIsActive] = useState(true);
   const [cursorVisible, setCursorVisible] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+  const [typingSpeed, setTypingSpeed] = useState(0);
+  const [accuracy, setAccuracy] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [showMetrics, setShowMetrics] = useState(false);
+
+  const currentText = texts[textIndex];
+  const difficultyColors = [
+    'from-emerald-500 to-teal-400',
+    'from-amber-500 to-yellow-400',
+    'from-rose-500 to-pink-400'
+  ];
+  const difficultyLabels = ['Beginner', 'Intermediate', 'Advanced'];
+  const difficulty = currentText?.difficulty || 1;
   
+  // Animation variants for text container
+  const containerVariants = {
+    hidden: { opacity: 0, y: 15, scale: 0.99 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        when: "beforeChildren",
+        staggerChildren: 0.02,
+        delayChildren: 0.1,
+        duration: 0.4,
+        ease: [0.22, 1, 0.36, 1]
+      },
+    },
+    exit: {
+      opacity: 0,
+      y: -10,
+      scale: 0.99,
+      transition: {
+        duration: 0.3,
+        ease: [0.4, 0, 0.2, 1]
+      }
+    }
+  };
+
+  // Animation variants for individual characters
+  const charVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 10,
+      scale: 0.95,
+      filter: 'blur(1px)'
+    },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      filter: 'blur(0px)',
+      transition: {
+        duration: 0.3,
+        delay: i * 0.015,
+        ease: [0.22, 1, 0.36, 1]
+      },
+    }),
+  };
+
+  // Animation for the progress bar with gradient
+  const progressBarVariants = {
+    initial: { 
+      width: '0%',
+      transition: { duration: 0.3, ease: 'easeInOut' }
+    },
+    animate: (i: number) => ({
+      width: `${i}%`,
+      transition: {
+        duration: 0.5,
+        ease: 'easeInOut',
+        delay: 0.2
+      }
+    })
+  };
+  
+  // Animation for difficulty indicator
+  const difficultyVariants = {
+    hidden: { width: 0 },
+    visible: {
+      width: `${(difficulty / 3) * 100}%`,
+      transition: {
+        duration: 0.8,
+        ease: [0.22, 1, 0.36, 1],
+        delay: 0.3
+      }
+    }
+  };
+
   useEffect(() => {
-    // Only animate if component is active
     if (!isActive) return;
     
-    // Animate typing with variable speed to look natural
-    const typingInterval = setInterval(() => {
-      setCurrentPosition(prev => {
-        // Reset when reaching end
-        if (prev >= text.length) {
-          setTimeout(() => {
-            setIsActive(false);
-            // Pause before restarting
-            setTimeout(() => {
-              setCurrentPosition(0);
-              setIsActive(true);
-            }, 2000);
-          }, 500);
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 100 + Math.random() * 100); // Variable speed between 100-200ms
+    // Calculate typing metrics
+    const calculateMetrics = () => {
+      // Simulate realistic WPM (words per minute) based on difficulty
+      const baseWPM = 30 + (difficulty * 15) + Math.random() * 10;
+      const currentWPM = Math.min(120, Math.max(20, baseWPM + (Math.random() * 10 - 5)));
+      
+      // Calculate accuracy with some variation
+      const baseAccuracy = 95 - (difficulty * 2);
+      const currentAccuracy = Math.max(85, Math.min(100, baseAccuracy + (Math.random() * 5 - 2.5)));
+      
+      setTypingSpeed(Math.round(currentWPM));
+      setAccuracy(parseFloat(currentAccuracy.toFixed(1)));
+    };
     
-    // Cursor blink animation
+    // Variable typing speed based on character type and difficulty
+    const getTypingSpeed = (char: string, pos: number) => {
+      // Base speed affected by difficulty
+      const baseDelay = 30 + (difficulty * 5) + (Math.random() * 30);
+      
+      // Slow down for special characters
+      if (/[A-Z]/.test(char)) return baseDelay * 1.5; // Slower for uppercase
+      if (/[^\w\s]/.test(char)) return baseDelay * 1.3; // Slower for symbols
+      
+      // Natural variation in typing speed
+      return baseDelay * (0.8 + Math.random() * 0.4);
+    };
+    
+    let typingTimeout: NodeJS.Timeout;
+    let lastMetricUpdate = 0;
+    
+    const typeNextCharacter = () => {
+      if (!isActive) return;
+      
+      const nextPos = currentPosition + 1;
+      const currentChar = currentText.content[currentPosition];
+      const elapsedTime = Date.now() - lastMetricUpdate;
+      
+      // Update metrics every 500ms for performance
+      if (elapsedTime > 500 || lastMetricUpdate === 0) {
+        calculateMetrics();
+        lastMetricUpdate = Date.now();
+      }
+      
+      setCurrentPosition(nextPos);
+      // Ensure progress calculation is accurate
+      const calculatedProgress = Math.min(100, Math.max(0, (nextPos / currentText.content.length) * 100));
+      setProgress(calculatedProgress);
+      
+      // Show metrics when reaching certain progress points
+      if (nextPos === 1) setShowMetrics(true);
+      
+      if (nextPos >= currentText.content.length) {
+        // Complete typing, show final metrics
+        calculateMetrics();
+        
+        // Pause at the end of text
+        setTimeout(() => {
+          setIsActive(false);
+          
+          // Switch to next text after a pause
+          setTimeout(() => {
+            setTextIndex((prevIndex) => (prevIndex + 1) % texts.length);
+            setCurrentPosition(0);
+            setProgress(0);
+            setShowMetrics(false);
+            setIsActive(true);
+          }, 1200);
+        }, 1000);
+        return;
+      }
+      
+      // Schedule next character with variable delay
+      const speed = getTypingSpeed(currentChar, nextPos);
+      typingTimeout = setTimeout(typeNextCharacter, speed);
+    };
+    
+    // Start typing with a slight delay
+    typingTimeout = setTimeout(typeNextCharacter, 200);
+    
+    // Cursor blink animation with smooth transition
     const cursorInterval = setInterval(() => {
       setCursorVisible(prev => !prev);
-    }, 530);
+    }, isHovered ? 1000 : 600); // Slower blink when hovered
     
     return () => {
-      clearInterval(typingInterval);
+      clearTimeout(typingTimeout);
       clearInterval(cursorInterval);
     };
-  }, [text, isActive]);
+  }, [currentPosition, isActive, currentText, isHovered, difficulty, texts.length]);
   
-  // Split text into typed and untyped parts
-  const typedText = text.substring(0, currentPosition);
-  const untypedText = text.substring(currentPosition);
+  // Split text into characters for animation
+  const typedText = currentText.content.substring(0, currentPosition);
+  const untypedText = currentText.content.substring(currentPosition);
+  
+  // Split text into characters for animation
+  const chars = currentText.content.split('');
   
   return (
-    <div className="w-full rounded-lg bg-background/90 border border-border/30 shadow-lg p-4 backdrop-blur-sm font-mono relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-8 bg-muted/30 flex items-center px-4 border-b border-border/20">
+    <motion.div 
+      className="group w-full rounded-xl bg-background/95 border border-border/30 shadow-2xl shadow-primary/5 hover:shadow-primary/10 transition-all duration-300 overflow-hidden font-mono relative"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      whileHover={{ 
+        y: -4,
+        boxShadow: '0 15px 30px -5px rgba(var(--primary), 0.15), 0 10px 15px -6px rgba(var(--primary), 0.1)',
+        scale: 1.01,
+        transition: { 
+          y: { type: 'spring', stiffness: 400, damping: 15 },
+          scale: { type: 'spring', stiffness: 300, damping: 20 },
+          boxShadow: { duration: 0.4 }
+        }
+      }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+    >
+      {/* Simplified terminal header */}
+      <div className="relative z-10 h-10 bg-muted/60 border-b border-border/20 flex items-center px-4">
         <div className="flex space-x-2">
-          <div className="w-3 h-3 rounded-full bg-red-500/70"></div>
-          <div className="w-3 h-3 rounded-full bg-yellow-500/70"></div>
-          <div className="w-3 h-3 rounded-full bg-green-500/70"></div>
+          <div className="w-3 h-3 rounded-full bg-red-500/90" />
+          <div className="w-3 h-3 rounded-full bg-yellow-500/90" />
+          <div className="w-3 h-3 rounded-full bg-green-500/90" />
         </div>
-        <div className="text-xs text-muted-foreground mx-auto font-sans">Terminal - typing preview</div>
+        <div className="absolute left-0 right-0 flex justify-center">
+          <div className="text-xs font-medium bg-background/80 px-3 py-1 rounded-full border border-border/20 flex items-center gap-1.5">
+            <span className="text-green-400">➜</span>
+            <span className="text-primary font-medium">typing-master</span>
+            <span className="mx-1 text-muted-foreground/60">•</span>
+            <span className="text-amber-500">{difficultyLabels[difficulty - 1]}</span>
+          </div>
+        </div>
       </div>
-      <div className="mt-6 text-base leading-relaxed">
-        <span className="text-primary font-medium">{typedText}</span>
-        <span className={`${cursorVisible ? 'visible' : 'invisible'} text-primary bg-primary/20 px-0.5 -ml-0.5`}>|</span>
-        <span className="text-muted-foreground">{untypedText}</span>
+      
+      {/* Terminal content */}
+      <div className="relative p-5 pt-6 pb-8 min-h-[180px] flex flex-col">
+        {/* Simplified metrics section with improved clarity */}
+        {showMetrics && (
+          <motion.div 
+            className="grid grid-cols-3 gap-4 mb-6 bg-muted/10 rounded-lg p-4 border border-border/20"
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {/* WPM Metric */}
+            <div className="text-center">
+              <motion.div 
+                className="text-2xl font-bold text-primary"
+                key={typingSpeed}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                {typingSpeed}
+              </motion.div>
+              <div className="text-xs text-muted-foreground mt-1">
+                WPM
+              </div>
+            </div>
+            
+            {/* Accuracy Metric */}
+            <div className="text-center">
+              <motion.div 
+                className="text-2xl font-bold text-foreground"
+                key={accuracy}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                {accuracy}%
+              </motion.div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Accuracy
+              </div>
+            </div>
+            
+            {/* Difficulty Metric */}
+            <div className="text-center">
+              <div className="flex justify-center">
+                {[1, 2, 3].map((level) => (
+                  <div 
+                    key={level}
+                    className={`h-1.5 w-5 rounded-full mx-0.5 ${
+                      level <= difficulty 
+                        ? 'bg-amber-500' 
+                        : 'bg-muted'
+                    }`}
+                  />
+                ))}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1.5">
+                {difficultyLabels[difficulty - 1]}
+              </div>
+            </div>
+          </motion.div>
+        )}
+        
+        {/* Simplified typing area with better contrast */}
+        <motion.div 
+          className="relative"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {/* Typing text with better readability */}
+          <div className="relative text-base md:text-[15px] leading-relaxed tracking-wide font-mono p-4 rounded-md bg-muted/10 border border-border/20 shadow-sm">
+            {/* Typed text with better contrast */}
+            <span className="text-foreground font-medium">
+              {typedText}
+            </span>
+            
+            {/* Simple cursor with reliable animation */}
+            <motion.span 
+              className="inline-block w-[2px] h-4 -mb-[1px] mx-[1px] rounded-sm bg-primary"
+              animate={{
+                opacity: cursorVisible ? [0.7, 1, 0.7] : 0
+              }}
+              transition={{ 
+                duration: 0.8, 
+                repeat: Infinity,
+                ease: "easeInOut" 
+              }}
+            />
+            
+            {/* Untyped text with better visibility */}
+            <span className="text-muted-foreground">
+              {untypedText}
+            </span>
+          </div>
+          
+          {/* Simplified progress bar */}
+          <div className="mt-4 h-2 bg-muted/30 rounded-full overflow-hidden">
+            <motion.div 
+              className="h-full bg-primary"
+              style={{ width: `${progress}%` }}
+              animate={{ width: `${progress}%` }}
+              transition={{ type: 'spring', stiffness: 100, damping: 15 }}
+            />
+          </div>
+        </motion.div>
+        
+        {/* Simplified status bar */}
+        <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between text-sm text-muted-foreground gap-3">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-xs font-medium">Live Preview</span>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            {/* Author badge */}
+            <div className="hidden sm:flex items-center gap-2 text-xs">
+              <span className="opacity-70">Author:</span>
+              <span className="font-medium text-primary">{currentText.author}</span>
+            </div>
+            
+            {/* Progress indicator */}
+            <div className="flex items-center gap-2 text-xs">
+              <Clock className="h-3 w-3 text-primary" />
+              <span className="font-medium">
+                {Math.round(progress)}% Complete
+              </span>
+            </div>
+          </div>
+        </div>
+      
       </div>
-      <div className="mt-3 text-xs text-muted-foreground flex items-center">
-        <Keyboard className="h-3 w-3 mr-1" /> 
-        <span>Live typing simulation • Try it yourself below</span>
+      
+      {/* Decorative elements */}
+      <div className="absolute inset-0 overflow-hidden opacity-10 pointer-events-none">
+        <div className="absolute inset-0 bg-grid-pattern"></div>
       </div>
-    </div>
+    </motion.div>
   );
 });
 
@@ -562,11 +888,26 @@ const Index = () => {
   
   const handleModeSelect = useCallback((mode: string) => {
     setSelectedMode(mode);
-    toast({
-      title: "Practice Mode Selected",
-      description: `You've selected the ${mode} practice mode. This feature is coming soon!`,
-    });
+    
+    // Handle different practice modes
+    switch(mode) {
+      case "word-practice":
+        window.location.hash = "#/word-practice";
+        break;
+      case "quote-practice":
+        window.location.hash = "#/quote-practice";
+        break;
+      case "code-practice":
+        window.location.hash = "#/code-practice";
+        break;
+      default:
+        toast({
+          title: "Practice Mode Selected",
+          description: `You've selected the ${mode} practice mode. This feature is coming soon!`,
+        });
+    }
   }, []);
+
 
   const navigateToTypingTest = useCallback(() => {
     window.location.hash = "#/typing-test";

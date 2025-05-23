@@ -260,11 +260,41 @@ export function Header() {
                     </DropdownMenuItem>
                   </motion.div>
                   
-                  {/* Multiplayer */}
+                  {/* Code Practice */}
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2, delay: 0.15 }}
+                  >
+                    <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer text-foreground hover:text-foreground hover:bg-background/50" onClick={() => window.location.hash = "#/code-practice"}>
+                      <Code className="h-4 w-4 text-blue-500" />
+                      <div>
+                        <div className="font-medium">Code Practice</div>
+                        <div className="text-xs text-foreground/80">Practice typing real code snippets</div>
+                      </div>
+                    </DropdownMenuItem>
+                  </motion.div>
+                  
+                  {/* Quote Practice */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: 0.1625 }}
+                  >
+                    <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer text-foreground hover:text-foreground hover:bg-background/50" onClick={() => window.location.hash = "#/quote-practice"}>
+                      <BookOpen className="h-4 w-4 text-purple-500" />
+                      <div>
+                        <div className="font-medium">Quote Practice</div>
+                        <div className="text-xs text-foreground/80">Type famous quotes and literature</div>
+                      </div>
+                    </DropdownMenuItem>
+                  </motion.div>
+                  
+                  {/* Multiplayer */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: 0.175 }}
                   >
                     <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer text-foreground hover:text-foreground hover:bg-background/50" onClick={() => window.location.hash = "#/multiplayer"}>
                       <UsersRound className="h-4 w-4 text-green-500" />
@@ -541,12 +571,32 @@ export function Header() {
                 </div>
               </div>
               
-              <div className="border-t border-border/20 my-2"></div>
-              <MobileNavLink to="/profile" active={location.pathname === "/profile"} icon={<User className="h-5 w-5" />}>
-                Profile
+              <div className="px-3 py-2 text-xs font-medium text-foreground/60 uppercase tracking-wider">
+                Practice Modes
+              </div>
+              <MobileNavLink to="/typing-test" icon={<Clock className="h-4 w-4 text-primary" />} active={location.pathname === "/typing-test"}>
+                Typing Test
               </MobileNavLink>
-              <MobileNavLink to="/about" active={location.pathname === "/about"} icon={<Info className="h-5 w-5" />}>
-                About
+              <MobileNavLink to="/practice" icon={<Target className="h-4 w-4 text-accent" />} active={location.pathname === "/practice"}>
+                Practice Mode
+              </MobileNavLink>
+              <MobileNavLink to="/word-practice" icon={<Type className="h-4 w-4 text-yellow-500" />} active={location.pathname === "/word-practice"}>
+                Word Practice
+              </MobileNavLink>
+              <MobileNavLink to="/code-practice" icon={<Code className="h-4 w-4 text-blue-500" />} active={location.pathname === "/code-practice"}>
+                Code Practice
+              </MobileNavLink>
+              <MobileNavLink to="/quote-practice" icon={<BookOpen className="h-4 w-4 text-purple-500" />} active={location.pathname === "/quote-practice"}>
+                Quote Practice
+              </MobileNavLink>
+              <div className="px-3 py-2 text-xs font-medium text-foreground/60 uppercase tracking-wider mt-2">
+                Challenges
+              </div>
+              <MobileNavLink to="/ai-challenge" icon={<Brain className="h-4 w-4 text-purple-500" />} active={location.pathname === "/ai-challenge"}>
+                AI Challenge
+              </MobileNavLink>
+              <MobileNavLink to="/multiplayer" icon={<UsersRound className="h-4 w-4 text-green-500" />} active={location.pathname === "/multiplayer"}>
+                Multiplayer
               </MobileNavLink>
             </nav>
           </motion.div>

@@ -24,6 +24,8 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const TypingTest = lazy(() => import("./pages/TypingTest"));
 const TypingPractice = lazy(() => import("./pages/TypingPractice"));
 const WordPractice = lazy(() => import("./pages/WordPractice"));
+const QuotePractice = lazy(() => import("./pages/QuotePractice"));
+const CodePractice = lazy(() => import("./pages/CodePractice"));
 const Multiplayer = lazy(() => import("./pages/Multiplayer"));
 const AIChallenge = lazy(() => import("./pages/AIChallenge"));
 
@@ -67,6 +69,8 @@ const AppRoutes = () => (
       <Route path="/typing-test" element={<ProtectedRoute><TypingTest /></ProtectedRoute>} />
       <Route path="/practice" element={<ProtectedRoute><TypingPractice /></ProtectedRoute>} />
       <Route path="/word-practice" element={<ProtectedRoute><WordPractice /></ProtectedRoute>} />
+      <Route path="/quote-practice" element={<ProtectedRoute><QuotePractice /></ProtectedRoute>} />
+      <Route path="/code-practice" element={<ProtectedRoute><CodePractice /></ProtectedRoute>} />
       <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
       <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

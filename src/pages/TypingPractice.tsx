@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { useNavigate } from "react-router-dom";
+import { calculateWPM, calculateAccuracy, calculateCPM } from "@/utils/textGenerator";
 
 // Generate practice text for problematic keys
 const generatePracticeText = (problemKeys: string[], length: number = 50): string => {
@@ -160,11 +161,13 @@ const TypingPractice = () => {
     }
     
     // Calculate WPM (5 characters = 1 word)
-    const words = input.length / 5;
-    const wpm = Math.round(words / elapsedTimeInMinutes);
+    const wpm = calculateWPM(input.length, practiceText.length - errorCount, elapsedTimeInMinutes * 60);
     
     // Calculate accuracy
-    const accuracy = Math.round(((input.length - errorCount) / input.length) * 100);
+    const accuracy = calculateAccuracy(input.length, input.length - errorCount);
+    
+    // Calculate CPM
+    const cpm = calculateCPM(input.length, elapsedTimeInMinutes * 60);
     
     setTypingStats({
       wpm,

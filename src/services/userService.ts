@@ -81,7 +81,14 @@ export async function getProfile(userId: string) {
  */
 export async function saveTypingStats(stats: UserStats) {
   // Validate required fields
-  if (!stats.user_id || !stats.date || !stats.wpm || !stats.accuracy || !stats.test_type || !stats.duration) {
+  if (
+    !stats.user_id ||
+    !stats.date ||
+    stats.wpm === undefined || stats.wpm === null ||
+    stats.accuracy === undefined || stats.accuracy === null ||
+    !stats.test_type ||
+    stats.duration === undefined || stats.duration === null
+  ) {
     console.error("Missing required fields for typing stats:", stats);
     throw new Error("Missing required fields for typing stats");
   }

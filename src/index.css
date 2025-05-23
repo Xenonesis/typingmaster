@@ -12,6 +12,33 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   }
   
+  .bg-grid-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 40px 40px;
+  }
+  
+  /* Typing Preview Component */
+  .typing-cursor {
+    background: linear-gradient(180deg, #3b82f6, #6366f1);
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.6);
+    transition: all 0.2s ease;
+  }
+  
+  .typing-cursor-visible {
+    opacity: 1;
+    transform: scaleX(0.8);
+  }
+  
+  .typing-cursor-hidden {
+    opacity: 0;
+    transform: scaleX(0.4);
+  }
+  
+  /* Progress bar width utility */
+  .progress-bar-width {
+    transition: width 300ms ease-out;
+  }
+  
   .gradient-heading {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70;
   }

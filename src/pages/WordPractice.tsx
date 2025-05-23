@@ -24,6 +24,7 @@ import {
   DialogTrigger 
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
+import { calculateWPM, calculateAccuracy, calculateCPM } from "@/utils/textGenerator";
 
 // Common English words categorized by length
 const wordSets = {
@@ -339,10 +340,11 @@ const WordPractice = () => {
     
     const endTime = Date.now();
     const elapsedTimeInMinutes = (endTime - typingStartTime) / 60000;
+    const elapsedTimeInSeconds = elapsedTimeInMinutes * 60;
     
     // Calculate WPM
     const words = practiceWords.length;
-    const wpm = Math.round(words / elapsedTimeInMinutes);
+    const wpm = calculateWPM(typedCharacters, correctCharacters, elapsedTimeInSeconds);
     
     // Calculate errors and accuracy
     let errorCount = 0;
@@ -362,9 +364,10 @@ const WordPractice = () => {
     });
     
     // Calculate accuracy
-    const accuracy = completedWords > 0 
-      ? Math.round((correctWords / completedWords) * 100)
-      : 0;
+    const accuracy = calculateAccuracy(totalCharacters, correctCharacters);
+    
+    // Calculate CPM
+    const cpm = calculateCPM(typedCharacters, elapsedTimeInSeconds);
     
     setTypingStats({
       wpm,
