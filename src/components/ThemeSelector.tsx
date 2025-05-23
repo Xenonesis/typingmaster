@@ -9,12 +9,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const themes = [
-  { name: "Light", value: "light" },
-  { name: "Dark", value: "dark" },
+  { name: "Classic", value: "classic" },
+  { name: "Classic Dark", value: "classicDark" },
   { name: "Ocean", value: "ocean" },
   { name: "Forest", value: "forest" },
   { name: "Sunset", value: "sunset" },
   { name: "Midnight", value: "midnight" },
+  { name: "Neon Cyberpunk", value: "neonCyberpunk" },
+  { name: "Earthy Tones", value: "earthyTones" },
 ] as const;
 
 export function ThemeSelector() {

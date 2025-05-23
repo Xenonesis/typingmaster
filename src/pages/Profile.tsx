@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/context/AuthContext";
+import { ThemePreferences } from "@/components/ThemePreferences";
+import { Theme } from "@/context/ThemeContextDefinition";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,7 +35,7 @@ function ProfileContent() {
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const [themePreference, setThemePreference] = useState<string>(() => 
-    localStorage.getItem("theme") || "system"
+    localStorage.getItem("theme") || "classic"
   );
   
   // Profile state
@@ -79,15 +81,15 @@ function ProfileContent() {
   useEffect(() => {
     // Apply theme based on preference
     if (themePreference === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "classicDark" : "classic";
       setTheme(systemTheme);
     } else {
       // Make sure we only set valid themes
-      const validThemes = ["light", "dark", "ocean", "forest", "sunset", "midnight"];
+      const validThemes = ["classic", "classicDark", "ocean", "forest", "sunset", "midnight", "neonCyberpunk", "earthyTones"];
       if (validThemes.includes(themePreference)) {
-        setTheme(themePreference as "light" | "dark" | "ocean" | "forest" | "sunset" | "midnight");
+        setTheme(themePreference as Theme);
       } else {
-        setTheme("light");
+        setTheme("classic" as Theme);
       }
     }
   }, [themePreference, setTheme]);
@@ -195,15 +197,15 @@ function ProfileContent() {
     localStorage.setItem("theme", value);
     // Apply theme based on preference
     if (value === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "classicDark" : "classic";
       setTheme(systemTheme);
     } else {
       // Make sure we only set valid themes
-      const validThemes = ["light", "dark", "ocean", "forest", "sunset", "midnight"];
+      const validThemes = ["classic", "classicDark", "ocean", "forest", "sunset", "midnight", "neonCyberpunk", "earthyTones"];
       if (validThemes.includes(value)) {
-        setTheme(value as "light" | "dark" | "ocean" | "forest" | "sunset" | "midnight");
+        setTheme(value as Theme);
       } else {
-        setTheme("light");
+        setTheme("classic" as Theme);
       }
     }
   };
@@ -560,22 +562,40 @@ function ProfileContent() {
                       )}
                     </TabsContent>
                     
-                    <TabsContent value="preferences" className="mt-0 space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="theme">Theme Preference</Label>
-                        <Select
-                          value={themePreference}
-                          onValueChange={handleThemeChange}
-                        >
-                          <SelectTrigger id="theme">
-                            <SelectValue placeholder="Select theme" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="system">System</SelectItem>
-                            <SelectItem value="light">Light</SelectItem>
-                            <SelectItem value="dark">Dark</SelectItem>
-                          </SelectContent>
-                        </Select>
+                    <TabsContent value="preferences" className="mt-0 space-y-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="theme" className="text-lg font-medium">Theme Preferences</Label>
+                          <Select
+                            value={themePreference === "system" ? "system" : theme}
+                            onValueChange={handleThemeChange}
+                          >
+                            <SelectTrigger id="theme" className="w-[140px]">
+                              <SelectValue placeholder="Select theme" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="system">System</SelectItem>
+                              <SelectItem value="classic">Classic</SelectItem>
+                              <SelectItem value="classicDark">Classic Dark</SelectItem>
+                              <SelectItem value="ocean">Ocean</SelectItem>
+                              <SelectItem value="forest">Forest</SelectItem>
+                              <SelectItem value="sunset">Sunset</SelectItem>
+                              <SelectItem value="midnight">Midnight</SelectItem>
+                              <SelectItem value="neonCyberpunk">Neon Cyberpunk</SelectItem>
+                              <SelectItem value="earthyTones">Earthy Tones</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        {themePreference !== "system" && (
+                          <ThemePreferences showDescription={false} />
+                        )}
+                        
+                        {themePreference === "system" && (
+                          <div className="text-sm text-muted-foreground p-4 bg-muted/50 rounded-md">
+                            <p>Using system theme. Your device will automatically switch between Classic and Classic Dark themes based on your system settings.</p>
+                          </div>
+                        )}
                       </div>
                     </TabsContent>
                   </CardContent>

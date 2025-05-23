@@ -1,0 +1,46 @@
+/* Theme Preview Styles */
+
+.theme-option-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.theme-option-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.theme-option-card.selected {
+  border-color: var(--theme-primary);
+}
+
+.theme-preview-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  height: 20px;
+  width: 20px;
+  background-color: var(--theme-primary);
+  color: var(--theme-background);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.theme-color-dot {
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+/* Theme preview container */
+.theme-preview-container {
+  position: relative;
+  overflow: hidden;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+/* No need for CSS variables with attr() since we'll apply styles directly via React */

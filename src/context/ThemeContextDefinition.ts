@@ -1,6 +1,6 @@
 import { createContext } from "react";
 
-export type Theme = "dark" | "light" | "ocean" | "forest" | "sunset" | "midnight";
+export type Theme = "classic" | "classicDark" | "ocean" | "forest" | "sunset" | "midnight" | "neonCyberpunk" | "earthyTones";
 
 export type ThemeColors = {
   primary: string;
@@ -17,19 +17,19 @@ export type ThemeContextType = {
 };
 
 export const themeConfigs: Record<Theme, ThemeColors> = {
-  light: {
-    primary: "hsl(222.2 47.4% 11.2%)",
-    secondary: "hsl(217.2 32.6% 17.5%)",
-    accent: "hsl(210 40% 98%)",
-    background: "hsl(0 0% 100%)",
-    text: "hsl(222.2 47.4% 11.2%)"
+  classic: {
+    primary: "hsl(221 83% 53%)", /* Bright blue for primary buttons/accents */
+    secondary: "hsl(217 100% 97%)", /* Very light blue for secondary elements */
+    accent: "hsl(190 90% 50%)", /* Cyan accent for highlights */
+    background: "hsl(210 50% 98%)", /* Slightly blue-tinted white background */
+    text: "hsl(222 47% 11%)" /* Dark blue text for readability */
   },
-  dark: {
-    primary: "hsl(210 40% 98%)",
-    secondary: "hsl(217.2 32.6% 17.5%)",
-    accent: "hsl(222.2 47.4% 11.2%)",
-    background: "hsl(222.2 84% 4.9%)",
-    text: "hsl(210 40% 98%)"
+  classicDark: {
+    primary: "hsl(221 83% 53%)", /* Bright blue for primary buttons/accents */
+    secondary: "hsl(215 28% 17%)", /* Dark blue-gray for secondary elements */
+    accent: "hsl(190 90% 50%)", /* Cyan accent for highlights */
+    background: "hsl(222 47% 5%)", /* Very dark blue-black background */
+    text: "hsl(210 40% 98%)" /* Very light blue-white text for readability */
   },
   ocean: {
     primary: "hsl(200 70% 50%)",
@@ -58,6 +58,20 @@ export const themeConfigs: Record<Theme, ThemeColors> = {
     accent: "hsl(270 70% 40%)",
     background: "hsl(250 30% 10%)",
     text: "hsl(250 15% 95%)"
+  },
+  neonCyberpunk: {
+    primary: "hsl(320 100% 60%)", // Bright pink
+    secondary: "hsl(200 100% 50%)", // Bright blue
+    accent: "hsl(135 100% 50%)", // Bright green
+    background: "hsl(260 30% 10%)", // Dark purple
+    text: "hsl(180 100% 80%)" // Cyan
+  },
+  earthyTones: {
+    primary: "hsl(35 80% 50%)", // Warm orange-brown
+    secondary: "hsl(90 40% 50%)", // Muted green
+    accent: "hsl(45 70% 60%)", // Soft gold
+    background: "hsl(30 30% 15%)", // Deep brown
+    text: "hsl(40 30% 90%)" // Warm off-white
   }
 };
 
