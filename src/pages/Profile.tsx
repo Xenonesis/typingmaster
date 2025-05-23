@@ -10,7 +10,8 @@ import {
   CardFooter
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ThemeProvider, useTheme } from "@/context/ThemeContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/context/AuthContext";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";

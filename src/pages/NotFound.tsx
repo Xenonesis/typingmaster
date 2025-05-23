@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Search, Home, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
-import { ThemeProvider } from "@/context/ThemeContext";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
@@ -18,9 +17,8 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <ThemeProvider>
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/90">
-        <Header />
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/90">
+      <Header />
         
         <div className="flex-grow flex items-center justify-center p-6">
           <motion.div 
@@ -62,19 +60,16 @@ const NotFound = () => {
                   Return Home
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="gap-2">
-                <Link to="javascript:history.back()">
-                  <ArrowLeft className="h-4 w-4" />
-                  Go Back
-                </Link>
+              <Button variant="outline" size="lg" className="gap-2" onClick={() => window.history.back()}>
+                <ArrowLeft className="h-4 w-4" />
+                Go Back
               </Button>
             </div>
           </motion.div>
         </div>
         
-        <Footer />
-      </div>
-    </ThemeProvider>
+      <Footer />
+    </div>
   );
 };
 

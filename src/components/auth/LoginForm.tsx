@@ -54,7 +54,7 @@ export function LoginForm() {
         });
         
         // Force page refresh to the home page
-        window.location.href = '/';
+        window.location.href = '/#/';
       }
     } catch (err) {
       toast({

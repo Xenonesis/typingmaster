@@ -85,7 +85,7 @@ export default function ResetPassword() {
         // Redirect to login page after 2 seconds
         setTimeout(() => {
           // Use hard navigation to ensure clean state
-          window.location.href = '/login';
+          window.location.href = '/#/login';
         }, 2000);
       }
     } catch (err) {

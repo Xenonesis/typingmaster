@@ -4,13 +4,13 @@ import { Footer } from "@/components/Footer";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Clock, 
-  Zap, 
-  Code2, 
-  Palette, 
-  LayoutGrid, 
-  BugOff, 
+import {
+  Clock,
+  Zap,
+  Code2,
+  Palette,
+  LayoutGrid,
+  BugOff,
   FileCode,
   ArrowUpCircle,
   Shield,
@@ -25,31 +25,34 @@ import {
   Star,
   ChevronUp,
   ChevronDown,
-  Users
+  Users,
+  Brain,
+  Mic,
+  BarChart3,
+  Globe,
+  Search,
+  Filter,
+  Download,
+  ExternalLink,
+  TrendingUp,
+  Calendar,
+  GitBranch,
+  Activity,
+  Eye,
+  Copy,
+  Check
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
 import { useState, useCallback } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "@/hooks/use-toast";
 
 // Define repository stats
 const repoStats = {
-  // Update stats to reflect recent changes
-<<<<<<< HEAD
-  commits: 887,
-  contributors: 14,
-  stars: 273,
-  forks: 102,
-  openIssues: 2,
-  closedIssues: 141,
-  lastUpdated: new Date().toLocaleDateString(),
-  // Add additional stats to highlight recent activity
-  recentCommits: 86,
-  commitsThisWeek: 45,
-  totalUpdates: 13,
-=======
   commits: 943,
   contributors: 17,
   stars: 328,
@@ -61,7 +64,6 @@ const repoStats = {
   recentCommits: 112,
   commitsThisWeek: 67,
   totalUpdates: 14,
->>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
   activeDevelopment: true,
   repositoryUrl: "https://github.com/Xenonesis/speed-typist-challenge",
   mainBranch: "main"
@@ -78,10 +80,6 @@ const languageData = [
 // Define the version history data
 const versionHistory = [
   {
-<<<<<<< HEAD
-    version: "7.5",
-    releaseDate: new Date().toLocaleDateString(),
-=======
     version: "8.0",
     releaseDate: new Date().toLocaleDateString(),
     title: "Advanced Analytics & Interactive Challenges Update",
@@ -142,7 +140,6 @@ const versionHistory = [
   {
     version: "7.5",
     releaseDate: "23 May 2025",
->>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
     title: "Word Practice & Accessibility Improvements",
     description: "Major update adding a dedicated Word Practice page with adaptive learning features and improved dark mode accessibility.",
     changes: [
@@ -865,21 +862,41 @@ const versionHistory = [
   }
 ];
 
-// Quick share functionality
+// Enhanced share functionality
 const ShareButton = () => {
-  const handleShare = useCallback(() => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'TypeSpeed Master Updates',
-        text: 'Check out the latest updates for TypeSpeed Master!',
-        url: window.location.href,
-      })
-      .catch((error) => console.log('Error sharing', error));
-    } else {
-      // Fallback for browsers that don't support navigator.share
-      navigator.clipboard.writeText(window.location.href)
-        .then(() => alert('Link copied to clipboard!'))
-        .catch((err) => console.error('Could not copy text: ', err));
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = useCallback(async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'TypeSpeed Master Updates',
+          text: 'Check out the latest updates for TypeSpeed Master!',
+          url: window.location.href,
+        });
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        toast({
+          title: "Link copied!",
+          description: "The page URL has been copied to your clipboard.",
+        });
+        setTimeout(() => setCopied(false), 2000);
+      } else {
+        // Fallback for browsers without clipboard API
+        toast({
+          title: "Share not supported",
+          description: "Your browser doesn't support sharing or clipboard operations.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      toast({
+        title: "Share failed",
+        description: "Could not share the page.",
+        variant: "destructive",
+      });
     }
   }, []);
 
@@ -887,59 +904,137 @@ const ShareButton = () => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-full"
-            onClick={handleShare}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <Share2 className="h-4 w-4" />
-          </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800 hover:shadow-md transition-all duration-300"
+              onClick={handleShare}
+            >
+              {copied ? (
+                <Check className="h-4 w-4 text-green-600" />
+              ) : (
+                <Share2 className="h-4 w-4 text-blue-600" />
+              )}
+              <span className="ml-2 text-sm font-medium">Share</span>
+            </Button>
+          </motion.div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Share this page</p>
+          <p>{copied ? "Copied to clipboard!" : "Share this page"}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
 };
 
-// GitHub Repository Button
+// Enhanced GitHub Repository Button
 const GitHubButton = () => {
+  const [stars, setStars] = useState(328);
+  const [starred, setStarred] = useState(false);
+
+  const handleStarRepo = useCallback(() => {
+    setStarred(!starred);
+    setStars(prev => starred ? prev - 1 : prev + 1);
+    toast({
+      title: starred ? "Unstarred repository" : "Starred repository!",
+      description: starred ? "Thanks for your feedback!" : "Thank you for supporting our project!",
+    });
+  }, [starred]);
+
   return (
-    <a 
-      href="https://github.com/Xenonesis/speed-typist-challenge"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 bg-[#24292e] hover:bg-[#1d2125] text-white font-medium py-2 px-4 rounded-xl transition-colors duration-300"
-    >
-      <Github className="h-5 w-5" />
-      <span>View on GitHub</span>
-    </a>
+    <div className="flex gap-2">
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <a
+          href="https://github.com/Xenonesis/speed-typist-challenge"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 text-white font-medium py-2 px-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
+        >
+          <Github className="h-4 w-4" />
+          <span className="text-sm">View on GitHub</span>
+          <ExternalLink className="h-3 w-3 opacity-70" />
+        </a>
+      </motion.div>
+      <motion.div
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          className={`rounded-full transition-all duration-300 ${starred ? 'bg-yellow-50 border-yellow-300 text-yellow-700 dark:bg-yellow-950/20 dark:border-yellow-700 dark:text-yellow-400' : 'hover:bg-yellow-50 hover:border-yellow-300 dark:hover:bg-yellow-950/20'}`}
+          onClick={handleStarRepo}
+        >
+          <Star className={`h-4 w-4 mr-2 ${starred ? 'fill-current' : ''}`} />
+          <span className="text-sm">{stars}</span>
+        </Button>
+      </motion.div>
+    </div>
   );
 };
 
-// Subscribe to updates button
+// Enhanced Subscribe to updates button
 const SubscribeButton = () => {
   const [subscribed, setSubscribed] = useState(false);
-  
-  const handleSubscribe = useCallback(() => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubscribe = useCallback(async () => {
+    setLoading(true);
+
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     setSubscribed(!subscribed);
+    setLoading(false);
+
+    toast({
+      title: subscribed ? "Unsubscribed successfully" : "Subscribed successfully!",
+      description: subscribed
+        ? "You won't receive update notifications anymore."
+        : "You'll now receive notifications about new updates and features.",
+    });
   }, [subscribed]);
 
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            variant={subscribed ? "default" : "outline"}
-            size="sm"
-            className={`rounded-full ${subscribed ? "bg-primary text-white" : ""}`}
-            onClick={handleSubscribe}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <Bell className="h-4 w-4 mr-2" />
-            {subscribed ? "Subscribed" : "Subscribe"}
-          </Button>
+            <Button
+              variant={subscribed ? "default" : "outline"}
+              size="sm"
+              className={`rounded-full transition-all duration-300 ${
+                subscribed
+                  ? "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg"
+                  : "bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-200 dark:border-purple-800 hover:shadow-md"
+              }`}
+              onClick={handleSubscribe}
+              disabled={loading}
+            >
+              {loading ? (
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                  className="h-4 w-4 mr-2 border-2 border-t-transparent border-current rounded-full"
+                />
+              ) : (
+                <Bell className={`h-4 w-4 mr-2 ${subscribed ? 'text-white' : 'text-purple-600'}`} />
+              )}
+              <span className={`text-sm font-medium ${subscribed ? 'text-white' : 'text-purple-600'}`}>
+                {subscribed ? "Subscribed" : "Subscribe"}
+              </span>
+            </Button>
+          </motion.div>
         </TooltipTrigger>
         <TooltipContent>
           <p>{subscribed ? "Unsubscribe from updates" : "Subscribe to get notified about new updates"}</p>
@@ -956,72 +1051,74 @@ const ComingSoonFeatures = () => {
       <CardHeader className="bg-gradient-to-r from-primary/10 to-background pb-3">
         <CardTitle className="flex items-center gap-2">
           <Cpu className="h-5 w-5 text-primary" />
-<<<<<<< HEAD
-          Coming Soon in v7.4
-=======
-          Coming Soon in v8.1
->>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
+          Coming Soon in v8.0
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-4">
         <div className="space-y-4">
           <div className="flex gap-3 items-start">
-            <div className="bg-primary/10 p-2 rounded-md">
-              <Sparkles className="h-5 w-5 text-primary" />
+            <div className="bg-blue-500/10 p-2 rounded-md">
+              <Users className="h-5 w-5 text-blue-500" />
             </div>
             <div>
-<<<<<<< HEAD
-              <h3 className="text-base font-medium mb-1">Keyboard Heatmap Analytics</h3>
+              <h3 className="text-base font-medium mb-1">Real-time Multiplayer Racing</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Visualize your typing patterns with an interactive keyboard heatmap, showing which keys you struggle with and where you excel.
-=======
-              <h3 className="text-base font-medium mb-1">AI-Powered Learning Paths</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Personalized learning paths that adapt to your typing style and skill level, with AI-generated exercises tailored to improve your specific weaknesses.
->>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
+                Join live typing competitions with players worldwide. Race in real-time with up to 10 players, complete with live leaderboards and spectator mode.
               </p>
             </div>
           </div>
-          
+
           <div className="flex gap-3 items-start">
-            <div className="bg-accent/10 p-2 rounded-md">
-              <Share2 className="h-5 w-5 text-accent" />
+            <div className="bg-purple-500/10 p-2 rounded-md">
+              <Brain className="h-5 w-5 text-purple-500" />
             </div>
             <div>
-<<<<<<< HEAD
-              <h3 className="text-base font-medium mb-1">Custom Race Challenges</h3>
+              <h3 className="text-base font-medium mb-1">AI-Powered Personalized Training</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Create custom typing challenges and invite friends to race against your best times with shareable challenge links.
-=======
-              <h3 className="text-base font-medium mb-1">Global Typing Tournaments</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Participate in scheduled global typing tournaments with live leaderboards, prizes, and competitive divisions based on skill levels.
->>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
+                Advanced machine learning algorithms analyze your typing patterns to create personalized exercises targeting your specific weaknesses and skill gaps.
               </p>
             </div>
           </div>
-          
+
           <div className="flex gap-3 items-start">
             <div className="bg-green-500/10 p-2 rounded-md">
-              <Github className="h-5 w-5 text-green-500" />
+              <Mic className="h-5 w-5 text-green-500" />
             </div>
             <div>
-<<<<<<< HEAD
-              <h3 className="text-base font-medium mb-1">Advanced GitHub Integration</h3>
+              <h3 className="text-base font-medium mb-1">Voice-to-Text Challenge Mode</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Pull code samples directly from GitHub repositories to practice typing real-world code snippets in your preferred programming languages.
-=======
-              <h3 className="text-base font-medium mb-1">Developer API & Extensions</h3>
+                Practice typing what you hear with audio dictation challenges. Perfect for improving listening skills and real-world typing scenarios.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-3 items-start">
+            <div className="bg-amber-500/10 p-2 rounded-md">
+              <BarChart3 className="h-5 w-5 text-amber-500" />
+            </div>
+            <div>
+              <h3 className="text-base font-medium mb-1">Advanced Analytics Dashboard</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Create custom typing exercises, themes, and integrations with our new developer API and extension marketplace for unlimited customization.
->>>>>>> 1660fe0 (Release version 8.0: Advanced Analytics & Interactive Challenges Update)
+                Comprehensive performance insights with predictive analytics, progress forecasting, and detailed breakdowns of your typing evolution over time.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-3 items-start">
+            <div className="bg-teal-500/10 p-2 rounded-md">
+              <Globe className="h-5 w-5 text-teal-500" />
+            </div>
+            <div>
+              <h3 className="text-base font-medium mb-1">Multi-Language & Layout Support</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Support for 20+ languages and keyboard layouts including QWERTY, Dvorak, Colemak, and international layouts with native character sets.
               </p>
             </div>
           </div>
         </div>
-        
+
         <div className="mt-5">
-          <a 
+          <a
             href="https://github.com/Xenonesis/speed-typist-challenge"
             target="_blank"
             rel="noopener noreferrer"
@@ -1039,67 +1136,169 @@ const ComingSoonFeatures = () => {
 export default function Updates() {
   const [activeTab, setActiveTab] = useState("releases");
   const [activePeriod, setActivePeriod] = useState<string>("all");
-  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredVersions, setFilteredVersions] = useState(versionHistory);
+
   const handlePeriodChange = useCallback((period: string) => {
     setActivePeriod(period);
   }, []);
 
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setFilteredVersions(versionHistory);
+      return;
+    }
+
+    const filtered = versionHistory.filter(version =>
+      version.title.toLowerCase().includes(query.toLowerCase()) ||
+      version.description.toLowerCase().includes(query.toLowerCase()) ||
+      version.version.includes(query) ||
+      version.changes.some(change =>
+        change.items.some(item =>
+          item.toLowerCase().includes(query.toLowerCase())
+        )
+      )
+    );
+    setFilteredVersions(filtered);
+  }, []);
+
   return (
     <ThemeProvider>
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/90">
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background/95 to-background/90">
         <Header />
-        
+
         <main className="flex-grow flex flex-col p-4 sm:p-6 pt-20 pb-20">
-          <div className="container max-w-5xl mx-auto">
-            <motion.div 
-              className="flex items-center space-x-3 mb-8"
+          <div className="container max-w-6xl mx-auto">
+            {/* Enhanced Header Section */}
+            <motion.div
+              className="text-center mb-12"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.6 }}
             >
-              <ArrowUpCircle className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl md:text-4xl font-bold gradient-heading">Updates & Changelog</h1>
+              <div className="flex items-center justify-center space-x-3 mb-4">
+                <div className="relative">
+                  <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-full blur-lg"></div>
+                  <ArrowUpCircle className="h-10 w-10 text-primary relative" />
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                  Updates & Changelog
+                </h1>
+              </div>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+                Stay up-to-date with the latest features, improvements, and fixes in TypeSpeed Master
+              </p>
+
+              {/* Search and Stats Bar */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-card/50 backdrop-blur-sm rounded-2xl p-6 border border-border/50">
+                <div className="flex items-center gap-4 w-full sm:w-auto">
+                  <div className="relative flex-1 sm:w-80">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search updates..."
+                      value={searchQuery}
+                      onChange={(e) => handleSearch(e.target.value)}
+                      className="pl-10 bg-background/80 border-border/60 rounded-full"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-muted-foreground">Active Development</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-primary" />
+                    <span className="font-medium">{versionHistory.length} Releases</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-accent" />
+                    <span className="font-medium">Weekly Updates</span>
+                  </div>
+                </div>
+              </div>
             </motion.div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              <div className="md:col-span-2">
+
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-12">
+              <div className="lg:col-span-3">
                 <Tabs defaultValue="releases" className="w-full" onValueChange={setActiveTab}>
-                  <TabsList className="mb-4">
-                    <TabsTrigger value="releases">Release History</TabsTrigger>
-                    <TabsTrigger value="github">GitHub Stats</TabsTrigger>
+                  <TabsList className="mb-6 bg-card/50 backdrop-blur-sm border border-border/50">
+                    <TabsTrigger value="releases" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Release History
+                    </TabsTrigger>
+                    <TabsTrigger value="github" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                      <Github className="h-4 w-4 mr-2" />
+                      GitHub Stats
+                    </TabsTrigger>
                   </TabsList>
-                  
+
                   <TabsContent value="releases" className="space-y-8 mt-0">
-                    <div className="flex items-center justify-between flex-wrap gap-4">
-                      <div className="font-medium text-lg">Version History</div>
-                      <div className="flex items-center rounded-lg overflow-hidden border border-border p-0.5">
-                        <button
-                          className={`px-3 py-1 text-sm ${activePeriod === 'all' ? 'bg-primary text-primary-foreground' : 'hover:bg-secondary'} rounded transition-colors`}
-                          onClick={() => handlePeriodChange('all')}
-                        >
-                          All
-                        </button>
-                        <button
-                          className={`px-3 py-1 text-sm ${activePeriod === 'major' ? 'bg-primary text-primary-foreground' : 'hover:bg-secondary'} rounded transition-colors`}
-                          onClick={() => handlePeriodChange('major')}
-                        >
-                          Major
-                        </button>
-                        <button
-                          className={`px-3 py-1 text-sm ${activePeriod === 'recent' ? 'bg-primary text-primary-foreground' : 'hover:bg-secondary'} rounded transition-colors`}
-                          onClick={() => handlePeriodChange('recent')}
-                        >
-                          Recent
-                        </button>
+                    <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
+                      <div className="flex items-center gap-3">
+                        <h2 className="text-xl font-semibold">Version History</h2>
+                        {searchQuery && (
+                          <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                            {filteredVersions.length} result{filteredVersions.length !== 1 ? 's' : ''}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Filter className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex items-center rounded-xl overflow-hidden border border-border/50 bg-card/30 backdrop-blur-sm p-1">
+                          <button
+                            type="button"
+                            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                              activePeriod === 'all'
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'hover:bg-secondary/80 text-muted-foreground hover:text-foreground'
+                            }`}
+                            onClick={() => handlePeriodChange('all')}
+                          >
+                            All
+                          </button>
+                          <button
+                            type="button"
+                            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                              activePeriod === 'major'
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'hover:bg-secondary/80 text-muted-foreground hover:text-foreground'
+                            }`}
+                            onClick={() => handlePeriodChange('major')}
+                          >
+                            Major
+                          </button>
+                          <button
+                            type="button"
+                            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                              activePeriod === 'recent'
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'hover:bg-secondary/80 text-muted-foreground hover:text-foreground'
+                            }`}
+                            onClick={() => handlePeriodChange('recent')}
+                          >
+                            Recent
+                          </button>
+                        </div>
                       </div>
                     </div>
-                    
-                    <div className="space-y-8">
-                      {versionHistory.map((version, index) => (
-                        <VersionCard key={version.version} version={version} isLatest={index === 0} />
-                      ))}
-                    </div>
-                    
+
+                    {filteredVersions.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Search className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium mb-2">No updates found</h3>
+                        <p className="text-muted-foreground">Try adjusting your search query or filters.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-8">
+                        {filteredVersions.map((version, index) => (
+                          <VersionCard key={version.version} version={version} isLatest={index === 0 && !searchQuery} />
+                        ))}
+                      </div>
+                    )}
+
                     <div className="flex items-center justify-between pt-4">
                       <Button variant="ghost" size="sm" className="flex items-center gap-1.5">
                         <ArrowLeft className="h-4 w-4" />
@@ -1112,7 +1311,7 @@ export default function Updates() {
                       </Button>
                     </div>
                   </TabsContent>
-                  
+
                   <TabsContent value="github" className="mt-0">
                     <Card className="border-border/30 shadow-sm overflow-hidden">
                       <CardHeader className="pb-3 bg-gradient-to-r from-[#24292e]/10 to-background">
@@ -1166,7 +1365,7 @@ export default function Updates() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="space-y-5 mb-6">
                           <div>
                             <div className="flex justify-between mb-2">
@@ -1191,7 +1390,7 @@ export default function Updates() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="space-y-2">
                           <div className="p-4 rounded-lg bg-[#24292e]/5 border border-[#24292e]/10 text-sm">
                             <p className="mb-2 flex items-center">
@@ -1221,7 +1420,7 @@ export default function Updates() {
                               </div>
                             </div>
                           </div>
-                          
+
                           <Button variant="outline" className="w-full flex items-center justify-center gap-2 bg-[#24292e] hover:bg-[#1d2125] text-white border-0">
                             <Github className="h-4 w-4" />
                             <span>View Repository</span>
@@ -1232,49 +1431,153 @@ export default function Updates() {
                   </TabsContent>
                 </Tabs>
               </div>
-              
+
+              {/* Enhanced Sidebar */}
               <div className="space-y-6">
                 <ComingSoonFeatures />
-                
-                <Card className="border-border/30 shadow-sm">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2">
-                      <Bell className="h-5 w-5 text-primary" />
-                      Stay Updated
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-2">
-                    <p className="text-sm text-muted-foreground mb-6">
-                      Subscribe to receive notifications about new features, updates, and typing tips.
-                    </p>
-                    
-                    <div className="flex flex-wrap gap-3 mb-6">
-                      <ShareButton />
-                      <GitHubButton />
-                      <SubscribeButton />
-                    </div>
-                  </CardContent>
-                </Card>
+
+                {/* Quick Actions Card */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                >
+                  <Card className="border-border/30 shadow-lg bg-gradient-to-br from-card/90 to-card/70 backdrop-blur-sm">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="flex items-center gap-2">
+                        <Bell className="h-5 w-5 text-primary" />
+                        Stay Connected
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-2">
+                      <p className="text-sm text-muted-foreground mb-6">
+                        Join our community and never miss an update. Get notified about new features, improvements, and typing tips.
+                      </p>
+
+                      <div className="space-y-3">
+                        <ShareButton />
+                        <GitHubButton />
+                        <SubscribeButton />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+
+                {/* Quick Stats Card */}
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                  <Card className="border-border/30 shadow-lg bg-gradient-to-br from-primary/5 to-accent/5 backdrop-blur-sm">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="flex items-center gap-2">
+                        <TrendingUp className="h-5 w-5 text-primary" />
+                        Development Stats
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-2">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center p-3 rounded-lg bg-background/60 border border-border/30">
+                          <div className="text-2xl font-bold text-primary">{versionHistory.length}</div>
+                          <div className="text-xs text-muted-foreground">Releases</div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-background/60 border border-border/30">
+                          <div className="text-2xl font-bold text-accent">328</div>
+                          <div className="text-xs text-muted-foreground">GitHub Stars</div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-background/60 border border-border/30">
+                          <div className="text-2xl font-bold text-green-600">943</div>
+                          <div className="text-xs text-muted-foreground">Commits</div>
+                        </div>
+                        <div className="text-center p-3 rounded-lg bg-background/60 border border-border/30">
+                          <div className="text-2xl font-bold text-blue-600">12</div>
+                          <div className="text-xs text-muted-foreground">Contributors</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               </div>
             </div>
-            
-            <div className="text-center mt-16">
-              <h3 className="text-xl font-bold mb-2">Enjoying TypeSpeed Master?</h3>
-              <p className="text-muted-foreground mb-4 max-w-xl mx-auto">
-                If you're enjoying our application and want to support our development, please consider starring our repository on GitHub!
-              </p>
-              <Button 
-                variant="default" 
-                className="bg-gradient-to-r from-primary via-[hsl(242,85%,60%)] to-accent hover:shadow-glow text-white"
-                onClick={() => window.open("https://github.com/Xenonesis/speed-typist-challenge", "_blank")}
-              >
-                <Star className="h-4 w-4 mr-2" />
-                Star on GitHub
-              </Button>
-            </div>
+
+            {/* Enhanced Call-to-Action Section */}
+            <motion.div
+              className="text-center mt-20"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <div className="relative">
+                <div className="absolute -inset-4 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-3xl blur-xl"></div>
+                <div className="relative bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl p-8 max-w-2xl mx-auto">
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="flex -space-x-2">
+                      <div className="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center">
+                        <Star className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="w-8 h-8 bg-gradient-to-r from-accent to-primary rounded-full flex items-center justify-center">
+                        <Github className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="w-8 h-8 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center">
+                        <Users className="h-4 w-4 text-white" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                    Enjoying TypeSpeed Master?
+                  </h3>
+                  <p className="text-muted-foreground mb-6 leading-relaxed">
+                    Join our growing community of developers and typing enthusiasts! Your support helps us continue building amazing features and improving the typing experience for everyone.
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button
+                        variant="default"
+                        size="lg"
+                        className="bg-gradient-to-r from-primary via-[hsl(242,85%,60%)] to-accent hover:shadow-xl text-white font-medium"
+                        onClick={() => window.open("https://github.com/Xenonesis/speed-typist-challenge", "_blank")}
+                      >
+                        <Star className="h-5 w-5 mr-2" />
+                        Star on GitHub
+                      </Button>
+                    </motion.div>
+
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="border-primary/30 hover:bg-primary/10 font-medium"
+                        onClick={() => window.open("https://github.com/Xenonesis/speed-typist-challenge/issues", "_blank")}
+                      >
+                        <GitBranch className="h-5 w-5 mr-2" />
+                        Contribute
+                      </Button>
+                    </motion.div>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-6 mt-6 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Eye className="h-4 w-4" />
+                      <span>1.2k+ users</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4" />
+                      <span>328 stars</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <GitBranch className="h-4 w-4" />
+                      <span>12 contributors</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </main>
-        
+
         <Footer />
       </div>
     </ThemeProvider>
@@ -1298,98 +1601,167 @@ interface VersionProps {
 
 function VersionCard({ version, isLatest }: VersionProps) {
   const [expanded, setExpanded] = useState(isLatest);
-  
+  const [isHovered, setIsHovered] = useState(false);
+
   const toggleExpand = useCallback(() => {
     setExpanded(!expanded);
   }, [expanded]);
-  
+
   return (
-    <motion.div 
+    <motion.div
       className="mb-8 relative"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
     >
-      <Card className={`border ${isLatest ? 'border-primary/30' : 'border-border/30'} overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300`}>
-        <CardHeader className={`${isLatest ? 'bg-primary/10' : 'bg-primary/5'} pb-3 border-b border-border/30`}>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <Badge className={`${isLatest ? 'bg-primary/20 text-primary hover:bg-primary/30' : 'bg-primary/10 text-primary hover:bg-primary/20'} border-none`}>
-                v{version.version}
-              </Badge>
-              <h2 className="text-xl font-bold">{version.title}</h2>
-              {isLatest && (
-                <Badge className="ml-2 bg-accent/20 text-accent hover:bg-accent/30 border-none">
-                  Latest
-                </Badge>
-              )}
-            </div>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Clock className="h-3.5 w-3.5 mr-1" />
-              {version.releaseDate}
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-6">
-          <p className="text-muted-foreground mb-6">{version.description}</p>
-          
-          <div className="space-y-5">
-            {version.changes.map((change, index) => (
-              <div key={index} className={`space-y-2 ${!expanded && index > 1 ? 'hidden' : ''}`}>
-                <h3 className="flex items-center text-lg font-semibold mb-2">
-                  <span className={`flex items-center justify-center w-6 h-6 ${
-                    change.type === 'feature' ? 'bg-primary/20' :
-                    change.type === 'ui' ? 'bg-purple-500/20' :
-                    change.type === 'code' ? 'bg-blue-500/20' :
-                    change.type === 'performance' ? 'bg-orange-500/20' :
-                    change.type === 'bugfix' ? 'bg-red-500/20' :
-                    change.type === 'security' ? 'bg-green-500/20' :
-                    'bg-secondary/20'
-                  } rounded-full mr-2`}>
-                    {change.icon}
-                  </span>
-                  <span className="capitalize">{change.type} Changes</span>
-                </h3>
-                <ul className="space-y-1.5 ml-8">
-                  {(expanded ? change.items : change.items.slice(0, 3)).map((item, itemIndex) => (
-                    <li key={itemIndex} className="flex items-start">
-                      <span className={`w-1.5 h-1.5 ${
-                        change.type === 'feature' ? 'bg-primary' :
-                        change.type === 'ui' ? 'bg-purple-500' :
-                        change.type === 'code' ? 'bg-blue-500' :
-                        change.type === 'performance' ? 'bg-orange-500' :
-                        change.type === 'bugfix' ? 'bg-red-500' :
-                        change.type === 'security' ? 'bg-green-500' :
-                        'bg-secondary'
-                      } rounded-full mt-2 mr-2 block`}></span>
-                      <span className="text-sm text-muted-foreground">{item}</span>
-                    </li>
-                  ))}
-                  {!expanded && change.items.length > 3 && (
-                    <li className="flex items-start">
-                      <span className="text-sm text-primary italic">and {change.items.length - 3} more...</span>
-                    </li>
-                  )}
-                </ul>
+      <Card className={`border ${
+        isLatest
+          ? 'border-primary/40 bg-gradient-to-br from-primary/5 to-accent/5'
+          : 'border-border/30 bg-card/80'
+      } overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm`}>
+
+        {/* Animated background glow for latest version */}
+        {isLatest && (
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-lg blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
+        )}
+
+        <div className="relative">
+          <CardHeader className={`${
+            isLatest
+              ? 'bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10'
+              : 'bg-primary/5'
+          } pb-4 border-b border-border/30`}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <motion.div
+                  animate={{ scale: isHovered ? 1.1 : 1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Badge className={`${
+                    isLatest
+                      ? 'bg-gradient-to-r from-primary to-accent text-white shadow-md'
+                      : 'bg-primary/15 text-primary hover:bg-primary/25'
+                  } border-none font-semibold px-3 py-1`}>
+                    v{version.version}
+                  </Badge>
+                </motion.div>
+                <h2 className="text-xl font-bold">{version.title}</h2>
+                {isLatest && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                  >
+                    <Badge className="bg-gradient-to-r from-accent to-primary text-white shadow-md border-none">
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      Latest
+                    </Badge>
+                  </motion.div>
+                )}
               </div>
-            ))}
-          </div>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            className="mt-4 text-primary"
-            onClick={toggleExpand}
-          >
-            {expanded ? (
-              <><ChevronUp className="h-4 w-4 mr-1" /> <span className="text-sm">Show Less</span></>
-            ) : (
-              <><ChevronDown className="h-4 w-4 mr-1" /> <span className="text-sm">Show More</span></>
-            )}
-          </Button>
-        </CardContent>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="h-4 w-4" />
+                <span className="font-medium">{version.releaseDate}</span>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <p className="text-muted-foreground mb-6 leading-relaxed">{version.description}</p>
+
+            <div className="space-y-6">
+              {version.changes.map((change, index) => (
+                <motion.div
+                  key={index}
+                  className={`space-y-3 ${!expanded && index > 1 ? 'hidden' : ''}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`flex items-center justify-center w-8 h-8 ${
+                      change.type === 'feature' ? 'bg-gradient-to-r from-primary/20 to-primary/30' :
+                      change.type === 'ui' ? 'bg-gradient-to-r from-purple-500/20 to-purple-500/30' :
+                      change.type === 'code' ? 'bg-gradient-to-r from-blue-500/20 to-blue-500/30' :
+                      change.type === 'performance' ? 'bg-gradient-to-r from-orange-500/20 to-orange-500/30' :
+                      change.type === 'bugfix' ? 'bg-gradient-to-r from-red-500/20 to-red-500/30' :
+                      change.type === 'security' ? 'bg-gradient-to-r from-green-500/20 to-green-500/30' :
+                      'bg-gradient-to-r from-secondary/20 to-secondary/30'
+                    } rounded-xl shadow-sm`}>
+                      {change.icon}
+                    </div>
+                    <h3 className="text-lg font-semibold capitalize">
+                      {change.type} Changes
+                    </h3>
+                    <Badge variant="outline" className="text-xs">
+                      {change.items.length} item{change.items.length !== 1 ? 's' : ''}
+                    </Badge>
+                  </div>
+
+                  <div className="ml-11 space-y-2">
+                    {(expanded ? change.items : change.items.slice(0, 3)).map((item, itemIndex) => (
+                      <motion.div
+                        key={itemIndex}
+                        className="flex items-start gap-3 p-3 rounded-lg bg-background/60 border border-border/30 hover:border-border/50 transition-colors"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: (index * 0.1) + (itemIndex * 0.05) }}
+                      >
+                        <div className={`w-2 h-2 ${
+                          change.type === 'feature' ? 'bg-primary' :
+                          change.type === 'ui' ? 'bg-purple-500' :
+                          change.type === 'code' ? 'bg-blue-500' :
+                          change.type === 'performance' ? 'bg-orange-500' :
+                          change.type === 'bugfix' ? 'bg-red-500' :
+                          change.type === 'security' ? 'bg-green-500' :
+                          'bg-secondary'
+                        } rounded-full mt-2 flex-shrink-0`}></div>
+                        <span className="text-sm text-foreground leading-relaxed">{item}</span>
+                      </motion.div>
+                    ))}
+
+                    {!expanded && change.items.length > 3 && (
+                      <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        <span className="text-sm text-primary font-medium">
+                          and {change.items.length - 3} more improvement{change.items.length - 3 !== 1 ? 's' : ''}...
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.div
+              className="mt-6 pt-4 border-t border-border/30"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-primary hover:bg-primary/10 font-medium"
+                onClick={toggleExpand}
+              >
+                {expanded ? (
+                  <>
+                    <ChevronUp className="h-4 w-4 mr-2" />
+                    <span>Show Less Details</span>
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-4 w-4 mr-2" />
+                    <span>Show All Changes</span>
+                  </>
+                )}
+              </Button>
+            </motion.div>
+          </CardContent>
+        </div>
       </Card>
-      
+
       {!isLatest && (
         <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-0.5 h-8 bg-gradient-to-b from-border to-transparent"></div>
       )}

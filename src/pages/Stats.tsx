@@ -187,22 +187,22 @@ export default function Stats() {
     // Load data from localStorage
     const storedData = localStorage.getItem("typingPersonalBests");
     const typingResults = storedData ? JSON.parse(storedData) : [];
-    
+
     // Get current user ID from localStorage (if available)
     // If you don't have a user system, you can use this approach to show all stats
     const currentUserId = localStorage.getItem("typingUserId") || "default";
-    
+
     // Filter results to show only current user's data
     // If you don't have a user ID system, this will show all results
-    const userResults = typingResults.filter((result: TestResultsData & { userId?: string }) => 
+    const userResults = typingResults.filter((result: TestResultsData & { userId?: string }) =>
       !result.userId || result.userId === currentUserId
     );
-    
+
     // If no test data or very few tests, add sample data
     if (userResults.length < 3) {
       // Get today's date for creating sample data
       const today = new Date();
-      
+
       const sampleData: TestResultsData[] = [
         {
           wpm: 78,
@@ -277,26 +277,26 @@ export default function Stats() {
           testTime: 60
         }
       ];
-      
+
       // Clear any existing test data and use our sample data
       localStorage.removeItem("typingPersonalBests");
       localStorage.setItem("typingPersonalBests", JSON.stringify(sampleData));
-      
+
       // Use the sample data for the current session
       setProgressData(sampleData);
       userResults.length = 0; // Clear the array
       userResults.push(...sampleData); // Add our sample data
     }
-    
+
     setProgressData(userResults);
 
     if (userResults.length > 0) {
       // Sort tests by date (newest first)
       const sortedTests = [...userResults].sort((a, b) => b.date - a.date);
-      
+
       // Set recent tests (last 10)
       setRecentTests(sortedTests.slice(0, 10));
-      
+
       // Format data for progress charts - last 7 tests, reversed for chronological view
       const lastSevenTests = sortedTests.slice(0, 7).reverse();
       const formatted = lastSevenTests.map(test => ({
@@ -311,10 +311,10 @@ export default function Stats() {
       userResults.forEach(test => {
         // Handle potential invalid dates
         if (!test.date) return;
-        
+
         const testDate = new Date(test.date);
         if (isNaN(testDate.getTime())) return; // Skip invalid dates
-        
+
         const hour = testDate.getHours();
         const hourKey = `${hour}`;
         if (!hourlyData[hourKey]) {
@@ -324,7 +324,7 @@ export default function Stats() {
         hourlyData[hourKey].total_accuracy += test.accuracy || 0; // Handle null/undefined accuracy
         hourlyData[hourKey].count += 1;
       });
-      
+
       const formattedHourlyData = Object.entries(hourlyData)
         .filter(([_, data]) => data.count > 0) // Only include hours with data
         .map(([hour, data]) => ({
@@ -334,9 +334,9 @@ export default function Stats() {
           count: data.count
         }))
         .sort((a, b) => parseInt(a.hour) - parseInt(b.hour)); // Sort by hour
-      
+
       setHourlyStats(formattedHourlyData);
-      
+
       // Calculate time of day performance
       // First validate all dates
       const validTests = userResults.filter(test => {
@@ -344,7 +344,7 @@ export default function Stats() {
         const testDate = new Date(test.date);
         return !isNaN(testDate.getTime());
       });
-      
+
       // If we have sample data, manually set the time of day distribution
       // This ensures the pie chart shows all segments
       if (userResults.length <= 7) {
@@ -360,71 +360,71 @@ export default function Stats() {
           const hour = new Date(test.date).getHours();
           return hour >= 5 && hour < 12;
         });
-        
+
         const afternoonTests = validTests.filter(test => {
           const hour = new Date(test.date).getHours();
           return hour >= 12 && hour < 17;
         });
-        
+
         const eveningTests = validTests.filter(test => {
           const hour = new Date(test.date).getHours();
           return hour >= 17 && hour < 21;
         });
-        
+
         const nightTests = validTests.filter(test => {
           const hour = new Date(test.date).getHours();
           return hour >= 21 || hour < 5;
         });
-        
+
         // Calculate average WPM and accuracy for each time of day
         const getMetrics = (tests: TestResultsData[]) => {
           if (tests.length === 0) return { avgWpm: 0, avgAccuracy: 0, bestWpm: 0 };
-          
+
           const avgWpm = tests.reduce((sum, test) => sum + (test.wpm || 0), 0) / tests.length;
           const avgAccuracy = tests.reduce((sum, test) => sum + (test.accuracy || 0), 0) / tests.length;
           const bestWpm = Math.max(...tests.map(test => test.wpm || 0));
-          
+
           return {
             avgWpm: Math.round(avgWpm),
             avgAccuracy: parseFloat(avgAccuracy.toFixed(1)),
             bestWpm: Math.round(bestWpm)
           };
         };
-        
+
         setTimeOfDayPerformance([
-          { 
-            name: 'Morning (5-11)', 
-            value: morningTests.length, 
-            ...getMetrics(morningTests) 
+          {
+            name: 'Morning (5-11)',
+            value: morningTests.length,
+            ...getMetrics(morningTests)
           },
-          { 
-            name: 'Afternoon (12-16)', 
-            value: afternoonTests.length, 
-            ...getMetrics(afternoonTests) 
+          {
+            name: 'Afternoon (12-16)',
+            value: afternoonTests.length,
+            ...getMetrics(afternoonTests)
           },
-          { 
-            name: 'Evening (17-20)', 
-            value: eveningTests.length, 
-            ...getMetrics(eveningTests) 
+          {
+            name: 'Evening (17-20)',
+            value: eveningTests.length,
+            ...getMetrics(eveningTests)
           },
-          { 
-            name: 'Night (21-4)', 
-            value: nightTests.length, 
-            ...getMetrics(nightTests) 
+          {
+            name: 'Night (21-4)',
+            value: nightTests.length,
+            ...getMetrics(nightTests)
           }
         ]);
       }
-      
+
       // Calculate weekday performance
       const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      
+
       // For sample data, create balanced weekday distribution
       if (userResults.length <= 7) {
         const weekdayData = weekdays.map((day, index) => {
           // Create a balanced distribution of WPM across weekdays
           // with slightly higher values for weekdays and slightly lower for weekends
           let wpm = 0;
-          
+
           // Use a more balanced distribution
           if (day === 'Monday' || day === 'Wednesday' || day === 'Friday') {
             wpm = 82 + (index % 3); // Higher values
@@ -433,7 +433,7 @@ export default function Stats() {
           } else {
             wpm = 75 + (index % 3); // Lower values for weekends
           }
-          
+
           return {
             name: day,
             wpm: wpm,
@@ -441,7 +441,7 @@ export default function Stats() {
             count: 1 + (index % 3)
           };
         });
-        
+
         setWeekdayPerformance(weekdayData);
       } else {
         const weekdayData = weekdays.map(day => {
@@ -449,14 +449,14 @@ export default function Stats() {
             const weekday = new Date(test.date).getDay();
             return weekdays[weekday] === day;
           });
-          
+
           if (dayTests.length === 0) {
             return { name: day, wpm: 0, accuracy: 0, count: 0 };
           }
-          
+
           const avgWpm = dayTests.reduce((sum, test) => sum + (test.wpm || 0), 0) / dayTests.length;
           const avgAccuracy = dayTests.reduce((sum, test) => sum + (test.accuracy || 0), 0) / dayTests.length;
-          
+
           return {
             name: day,
             wpm: Math.round(avgWpm),
@@ -464,7 +464,7 @@ export default function Stats() {
             count: dayTests.length
           };
         });
-        
+
         // Make sure we have some data for the radar chart - add dummy data if all zeros
         const hasData = weekdayData.some(day => day.wpm > 0);
         if (!hasData && validTests.length > 0) {
@@ -474,40 +474,40 @@ export default function Stats() {
             day.accuracy = 90 + (index % 4);
           });
         }
-        
+
         setWeekdayPerformance(weekdayData);
       }
-      
+
       // Calculate summary statistics
       const totalWPM = userResults.reduce((sum, test) => sum + test.wpm, 0);
       const totalAccuracy = userResults.reduce((sum, test) => sum + test.accuracy, 0);
       const highestWPM = Math.max(...userResults.map(test => test.wpm));
       const bestAccuracy = Math.max(...userResults.map(test => test.accuracy));
-      
+
       // Approximate total characters and words from WPM
       // Each WPM represents approximately 5 characters per minute (average word length)
       const validTimedTests = userResults.filter(test => test.wpm !== undefined && test.wpm !== null);
       const testTimes = validTimedTests.map(test => test.testTime || 60);
       const totalTestTimeSeconds = testTimes.reduce((sum, time) => sum + time, 0);
       const totalTestTimeMinutes = totalTestTimeSeconds / 60;
-      
+
       let totalCharacters = 0;
       let totalWords = 0;
-      
+
       // Calculate more precisely for each test based on its WPM and time
       validTimedTests.forEach(test => {
         const testTimeMinutes = (test.testTime || 60) / 60;
         const testWords = test.wpm * testTimeMinutes;
         const testChars = testWords * 5; // Assume 5 chars per word on average
-        
+
         totalWords += testWords;
         totalCharacters += testChars;
       });
-      
+
       // Round to integers
       totalCharacters = Math.round(totalCharacters);
       totalWords = Math.round(totalWords);
-      
+
       // Calculate improvement rate
       let improvementRate = 0;
       if (userResults.length >= 5) {
@@ -518,24 +518,24 @@ export default function Stats() {
           const dateB = b.date ? new Date(b.date).getTime() : 0;
           return dateA - dateB;
         });
-        
+
         const oldestFive = sortedResults.slice(0, 5);
         const latestFive = sortedResults.slice(-5); // Get last 5
-        
+
         const oldAvgWPM = oldestFive.reduce((sum, test) => sum + (test.wpm || 0), 0) / oldestFive.length || 1; // Avoid division by zero
         const newAvgWPM = latestFive.reduce((sum, test) => sum + (test.wpm || 0), 0) / latestFive.length || 1; // Avoid division by zero
-        
+
         // Calculate improvement percentage
         improvementRate = parseFloat(((newAvgWPM - oldAvgWPM) / Math.max(1, oldAvgWPM) * 100).toFixed(1));
       }
-      
+
       // Calculate consistency score
       const wpmValues = userResults.map(test => test.wpm);
       const wpmStdDev = calculateStandardDeviation(wpmValues);
       // Avoid division by zero or very small averages
       const avgWPM = Math.max(1, totalWPM / userResults.length);
       const consistencyScore = 100 - Math.min(100, Math.max(0, wpmStdDev / (avgWPM * 0.1) * 10));
-      
+
       // Sort by date to find streaks (simplified version)
       const validDatedTests = userResults
         .filter(test => test.date && !isNaN(new Date(test.date).getTime()))
@@ -544,10 +544,10 @@ export default function Stats() {
           dateObj: new Date(test.date)
         }))
         .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
-        
+
       let longestStreak = 1;
       let currentStreak = 1;
-      
+
       // Group tests by day to count only one test per day for streak calculation
       const testsByDay = new Map();
       validDatedTests.forEach(test => {
@@ -556,18 +556,18 @@ export default function Stats() {
           testsByDay.set(dateStr, test);
         }
       });
-      
+
       // Convert map to array and sort by date
       const uniqueDailyTests = Array.from(testsByDay.values())
         .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
-      
+
       for (let i = 1; i < uniqueDailyTests.length; i++) {
         const prevDate = uniqueDailyTests[i-1].dateObj;
         const currDate = uniqueDailyTests[i].dateObj;
-        
+
         // Calculate difference in days
         const dayDiff = Math.round((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
-        
+
         if (dayDiff === 1) {
           currentStreak++;
           longestStreak = Math.max(longestStreak, currentStreak);
@@ -575,12 +575,12 @@ export default function Stats() {
           currentStreak = 1;
         }
       }
-      
+
       // Calculate average tests per day
       const validDates = userResults
         .filter(test => test.date && !isNaN(new Date(test.date).getTime()))
         .map(test => new Date(test.date).getTime());
-        
+
       let avgTestsPerDay = 0;
       if (validDates.length > 0) {
         const oldestTest = Math.min(...validDates);
@@ -609,7 +609,7 @@ export default function Stats() {
       // In a real app, this would use actual typing error data from localStorage
       const userErrorData = localStorage.getItem("typingErrorData");
       let errorData = {};
-      
+
       try {
         if (userErrorData) {
           errorData = JSON.parse(userErrorData);
@@ -617,23 +617,23 @@ export default function Stats() {
       } catch (error) {
         console.error("Error parsing error data:", error);
       }
-      
+
       // Either use real user data or fallback to sample data
       const hasRealMistakeData = userErrorData && Object.keys(errorData).length > 0;
-      
+
       let mistakeData: MistakeData[] = [];
       let totalErrors = 0;
-      
+
       if (hasRealMistakeData) {
         // Use real user error data
         mistakeData = Object.entries(errorData)
-          .map(([letter, count]) => ({ 
-            letter, 
+          .map(([letter, count]) => ({
+            letter,
             count: count as number
           }))
           .sort((a, b) => b.count - a.count)
           .slice(0, 12);
-          
+
         totalErrors = mistakeData.reduce((sum, item) => sum + item.count, 0);
       } else {
         // Use sample data
@@ -651,23 +651,23 @@ export default function Stats() {
           { letter: "d", count: 8 },
           { letter: "c", count: 7 },
         ];
-        
+
         totalErrors = mistakeData.reduce((sum, item) => sum + item.count, 0);
       }
-      
+
       // Add percentage to each mistake
       mistakeData = mistakeData.map(mistake => ({
         ...mistake,
         percentage: parseFloat(((mistake.count / totalErrors) * 100).toFixed(1))
       }));
-      
+
       // Add categorization and suggestions
       const keyboardRows = {
         top: "qwertyuiop".split(""),
         home: "asdfghjkl".split(""),
         bottom: "zxcvbnm".split("")
       };
-      
+
       const getKeyCategory = (key: string): string => {
         if (keyboardRows.top.includes(key)) return "Top Row";
         if (keyboardRows.home.includes(key)) return "Home Row";
@@ -675,7 +675,7 @@ export default function Stats() {
         if (key === " ") return "Space";
         return "Special Key";
       };
-      
+
       const getSuggestion = (key: string, category: string): string => {
         const suggestions: Record<string, string> = {
           "Top Row": "Practice reaching up without looking at keyboard",
@@ -684,7 +684,7 @@ export default function Stats() {
           "Space": "Practice thumb positioning on spacebar",
           "Special Key": "Memorize the position of special characters"
         };
-        
+
         // Specific suggestions for common problem keys
         const specificSuggestions: Record<string, string> = {
           "t": "Use your left index finger, reaching upward from 'f'",
@@ -694,10 +694,10 @@ export default function Stats() {
           "h": "Use your right index finger, reaching toward the left from 'j'",
           "b": "Use your left index finger, reaching downward from 'f'"
         };
-        
+
         return specificSuggestions[key] || suggestions[category] || "Practice this character more frequently";
       };
-      
+
       // Enhance mistake data with categories and suggestions
       mistakeData = mistakeData.map(mistake => {
         const category = getKeyCategory(mistake.letter);
@@ -707,9 +707,9 @@ export default function Stats() {
           suggestion: getSuggestion(mistake.letter, category)
         };
       });
-      
+
       setFrequentMistakes(mistakeData);
-      
+
       // Generate character performance data
       // In a production app, this would come from actual keystroke timing data
       const alphabet = "abcdefghijklmnopqrstuvwxyz";
@@ -718,7 +718,7 @@ export default function Stats() {
         const accuracy = Math.min(100, Math.max(75, 92 + (Math.random() * 16 - 8)));
         const speed = Math.min(200, Math.max(50, 120 + (Math.random() * 60 - 30)));
         const frequency = Math.floor(Math.random() * 100) + 1;
-        
+
         return {
           character: char,
           speed: Math.round(speed), // milliseconds per keystroke
@@ -726,10 +726,10 @@ export default function Stats() {
           frequency: frequency
         };
       });
-      
+
       // Sort by frequency for more realistic data
       characterStats.sort((a, b) => b.frequency - a.frequency);
-      
+
       // Common letters should be more frequent and more accurate
       ['e', 't', 'a', 'o', 'i', 'n'].forEach(commonChar => {
         const charObj = characterStats.find(c => c.character === commonChar);
@@ -738,24 +738,24 @@ export default function Stats() {
           charObj.accuracy = Math.min(100, charObj.accuracy + 2);
         }
       });
-      
+
       setCharacterPerformance(characterStats);
-      
+
       // Generate typing patterns analysis
       const fastestKeys = [...characterStats]
         .sort((a, b) => a.speed - b.speed)
         .slice(0, 5)
         .map(c => ({ key: c.character, speed: c.speed }));
-        
+
       const slowestKeys = [...characterStats]
         .sort((a, b) => b.speed - a.speed)
         .slice(0, 5)
         .map(c => ({ key: c.character, speed: c.speed }));
-      
+
       const averageKeySpeed = Math.round(
         characterStats.reduce((sum, char) => sum + char.speed, 0) / characterStats.length
       );
-      
+
       // Generate common trigrams (three-letter sequences)
       const commonEnglishTrigrams = [
         { sequence: "the", count: 152 },
@@ -769,7 +769,7 @@ export default function Stats() {
         { sequence: "nth", count: 41 },
         { sequence: "tio", count: 38 }
       ];
-      
+
       setTypingPatterns({
         fastestKeys,
         slowestKeys,
@@ -785,10 +785,10 @@ export default function Stats() {
         date.setDate(date.getDate() - i);
         return date.toISOString().split('T')[0];
       }).reverse();
-      
+
       // Group tests by date
       const testsByDate: Record<string, {count: number, totalWpm: number, totalAccuracy: number, totalDuration: number}> = {};
-      
+
       validTests.forEach(test => {
         const dateStr = new Date(test.date).toISOString().split('T')[0];
         if (!testsByDate[dateStr]) {
@@ -799,12 +799,12 @@ export default function Stats() {
         testsByDate[dateStr].totalAccuracy += test.accuracy || 0;
         testsByDate[dateStr].totalDuration += test.testTime || 0;
       });
-      
+
       // Create heatmap data
       const heatmapData = last30Days.map(date => {
         const stats = testsByDate[date] || { count: 0, totalWpm: 0, totalAccuracy: 0, totalDuration: 0 };
         const dayTimestamp = new Date(date).getTime();
-        
+
         return {
           date,
           count: stats.count,
@@ -814,13 +814,13 @@ export default function Stats() {
           timestamp: dayTimestamp
         };
       });
-      
+
       setActivityHeatmap(heatmapData);
-      
+
       // Generate difficulty level statistics
       const difficultyMap: Record<string, {
-        totalWpm: number, 
-        totalAccuracy: number, 
+        totalWpm: number,
+        totalAccuracy: number,
         testCount: number,
         bestWpm: number,
         bestAccuracy: number,
@@ -831,14 +831,14 @@ export default function Stats() {
         intermediate: {totalWpm: 0, totalAccuracy: 0, testCount: 0, bestWpm: 0, bestAccuracy: 0, firstWpm: 0, lastWpm: 0},
         advanced: {totalWpm: 0, totalAccuracy: 0, testCount: 0, bestWpm: 0, bestAccuracy: 0, firstWpm: 0, lastWpm: 0},
       };
-      
+
       // Organize tests by difficulty
       const testsByDifficulty: Record<string, TestResultsData[]> = {
         beginner: [],
         intermediate: [],
         advanced: []
       };
-      
+
       validTests.forEach(test => {
         const difficulty = test.difficulty || 'intermediate';
         if (difficultyMap[difficulty]) {
@@ -846,37 +846,37 @@ export default function Stats() {
           difficultyMap[difficulty].totalWpm += test.wpm || 0;
           difficultyMap[difficulty].totalAccuracy += test.accuracy || 0;
           difficultyMap[difficulty].testCount += 1;
-          
+
           // Track best scores
           difficultyMap[difficulty].bestWpm = Math.max(difficultyMap[difficulty].bestWpm, test.wpm || 0);
           difficultyMap[difficulty].bestAccuracy = Math.max(difficultyMap[difficulty].bestAccuracy, test.accuracy || 0);
-          
+
           // Add to tests array
           if (testsByDifficulty[difficulty]) {
             testsByDifficulty[difficulty].push(test);
           }
         }
       });
-      
+
       // Calculate improvement for each difficulty level
       Object.keys(testsByDifficulty).forEach(difficulty => {
         const tests = testsByDifficulty[difficulty];
         if (tests.length >= 2) {
           // Sort by date
           tests.sort((a, b) => a.date - b.date);
-          
+
           // Save first and last WPM
           difficultyMap[difficulty].firstWpm = tests[0].wpm || 0;
           difficultyMap[difficulty].lastWpm = tests[tests.length - 1].wpm || 0;
         }
       });
-      
+
       // Create the final difficulty data
       const difficultyData = Object.entries(difficultyMap).map(([level, stats]) => {
-        const improvement = stats.testCount >= 2 
+        const improvement = stats.testCount >= 2
           ? parseFloat(((stats.lastWpm - stats.firstWpm) / Math.max(1, stats.firstWpm) * 100).toFixed(1))
           : 0;
-          
+
         return {
           level: level.charAt(0).toUpperCase() + level.slice(1),
           wpm: stats.testCount > 0 ? Math.round(stats.totalWpm / stats.testCount) : 0,
@@ -887,9 +887,9 @@ export default function Stats() {
           improvement
         };
       });
-      
+
       setDifficultyLevelStats(difficultyData);
-      
+
       // Generate WPM distribution data
       const speedRanges = [
         { min: 0, max: 20, label: '0-20' },
@@ -900,20 +900,20 @@ export default function Stats() {
         { min: 101, max: 120, label: '101-120' },
         { min: 121, max: 1000, label: '120+' }
       ];
-      
+
       const speedCounts = speedRanges.map(range => {
-        const count = validTests.filter(test => 
+        const count = validTests.filter(test =>
           test.wpm >= range.min && test.wpm <= range.max
         ).length;
-        
+
         return {
           range: range.label,
           count
         };
       });
-      
+
       setSpeedDistribution(speedCounts);
-      
+
       // Generate errors by character position
       const errorPositions = [
         { position: "First", errorCount: 12 },
@@ -921,7 +921,7 @@ export default function Stats() {
         { position: "Last", errorCount: 18 },
         { position: "Space", errorCount: 8 }
       ];
-      
+
       setErrorsByCharPosition(errorPositions);
 
       // Calculate improvement insights
@@ -929,35 +929,35 @@ export default function Stats() {
         // Calculate recent average (last 3 tests)
         const recentAvgWPM = sortedTests.slice(0, 3).reduce((sum, test) => sum + test.wpm, 0) / 3;
         const recentAvgAccuracy = sortedTests.slice(0, 3).reduce((sum, test) => sum + test.accuracy, 0) / 3;
-        
+
         // Calculate previous average (tests 4-6)
-        const prevAvgWPM = sortedTests.slice(3, 6).length > 0 
-          ? sortedTests.slice(3, 6).reduce((sum, test) => sum + test.wpm, 0) / sortedTests.slice(3, 6).length 
+        const prevAvgWPM = sortedTests.slice(3, 6).length > 0
+          ? sortedTests.slice(3, 6).reduce((sum, test) => sum + test.wpm, 0) / sortedTests.slice(3, 6).length
           : recentAvgWPM;
         const prevAvgAccuracy = sortedTests.slice(3, 6).length > 0
           ? sortedTests.slice(3, 6).reduce((sum, test) => sum + test.accuracy, 0) / sortedTests.slice(3, 6).length
           : recentAvgAccuracy;
-        
+
         // Calculate consistency (standard deviation of recent tests)
         const recentWPMs = sortedTests.slice(0, 5).map(test => test.wpm);
         const wpmStdDev = calculateStandardDeviation(recentWPMs);
-        const consistencyChange = prevAvgWPM > 0 
-          ? (wpmStdDev / prevAvgWPM) - (wpmStdDev / recentAvgWPM) 
+        const consistencyChange = prevAvgWPM > 0
+          ? (wpmStdDev / prevAvgWPM) - (wpmStdDev / recentAvgWPM)
           : 0;
-        
+
         // Calculate speed change
         const speedChange = recentAvgWPM - prevAvgWPM;
         const speedChangePercent = prevAvgWPM > 0 ? (speedChange / prevAvgWPM) * 100 : 0;
-        
+
         // Calculate accuracy change
         const accuracyChange = recentAvgAccuracy - prevAvgAccuracy;
-        
+
         // Generate insights
         const insights: ImprovementInsight[] = [
           {
             title: "Typing Speed",
-            description: speedChange > 0 
-              ? "Your typing speed is improving!" 
+            description: speedChange > 0
+              ? "Your typing speed is improving!"
               : "Your typing speed has decreased slightly.",
             metric: "WPM",
             change: parseFloat(speedChangePercent.toFixed(1)),
@@ -965,8 +965,8 @@ export default function Stats() {
           },
           {
             title: "Accuracy",
-            description: accuracyChange > 0 
-              ? "Your typing accuracy is improving!" 
+            description: accuracyChange > 0
+              ? "Your typing accuracy is improving!"
               : "Your typing accuracy has decreased slightly.",
             metric: "%",
             change: parseFloat(accuracyChange.toFixed(1)),
@@ -974,15 +974,15 @@ export default function Stats() {
           },
           {
             title: "Consistency",
-            description: consistencyChange > 0 
-              ? "Your typing is becoming more consistent!" 
+            description: consistencyChange > 0
+              ? "Your typing is becoming more consistent!"
               : "Your typing consistency has decreased.",
             metric: "%",
             change: parseFloat((Math.abs(consistencyChange) * 100).toFixed(1)),
             positive: consistencyChange > 0
           }
         ];
-        
+
         setImprovementInsights(insights);
       } else {
         // Default insights for new users
@@ -1015,9 +1015,9 @@ export default function Stats() {
       const lastTwoWeeksTests = [...sortedTests]
         .sort((a, b) => a.date - b.date) // Sort by date ascending
         .slice(-14); // Take last 14 tests
-        
+
       // Make sure we have at least some data points
-      const detailedData = lastTwoWeeksTests.length > 0 ? 
+      const detailedData = lastTwoWeeksTests.length > 0 ?
         lastTwoWeeksTests.map(test => ({
           date: new Date(test.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
           wpm: test.wpm,
@@ -1035,11 +1035,11 @@ export default function Stats() {
             duration: 60
           };
         });
-      
+
       setDetailedPerformance(detailedData);
     }
   }, []);
-  
+
   // Helper function to calculate standard deviation
   const calculateStandardDeviation = (array: number[]) => {
     const n = array.length;
@@ -1051,14 +1051,14 @@ export default function Stats() {
   // Generate color based on test count
   const getHeatmapColor = (count: number) => {
     if (count === 0) return 'hsl(var(--muted))';
-    
+
     // Use a logarithmic scale for better distribution of colors
     const intensity = Math.min(0.9, Math.log(count + 1) / Math.log(10) * 0.6);
-    
+
     // Return a gradient from light to dark primary color
     return `hsl(var(--primary), ${30 + intensity * 70}%)`;
   };
-  
+
   // Group heatmap data by week for rendering
   const heatmapByWeek = activityHeatmap.reduce((acc, curr, index) => {
     const weekIndex = Math.floor(index / 7);
@@ -1098,7 +1098,7 @@ export default function Stats() {
       "z": ["zombie", "zigzag", "zealous", "zipping", "zooming", "zenith"],
       " ": ["type with spaces", "practice your spacing", "mind the gap", "words between spaces"]
     };
-    
+
     // Return words for the character, or default to general practice words
     return commonWords[char] || ["the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog"];
   };
@@ -1111,18 +1111,18 @@ export default function Stats() {
       home: "asdfghjkl".split(""),
       bottom: "zxcvbnm".split("")
     };
-    
+
     // Calculate total errors for percentage calculation
     const totalErrors = frequentMistakes.reduce((sum, m) => sum + m.count, 0);
-    
+
     return Object.entries(keyboardRows).map(([rowName, keys]) => {
       // Calculate errors per row
       const rowMistakes = frequentMistakes.filter(m => keys.includes(m.letter));
       const rowTotal = rowMistakes.reduce((sum, m) => sum + m.count, 0);
-      const rowPercentage = totalErrors > 0 
+      const rowPercentage = totalErrors > 0
         ? parseFloat(((rowTotal / totalErrors) * 100).toFixed(1))
         : 0;
-    
+
       return {
         rowName,
         keys,
@@ -1139,21 +1139,21 @@ export default function Stats() {
       setIsOnline(true);
       syncPendingDataWithServer();
     };
-    
+
     const handleOffline = () => {
       setIsOnline(false);
     };
-    
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-    
+
     // Check if we have any pending syncs on mount
     const pendingSyncData = localStorage.getItem("typingPendingSync");
     if (pendingSyncData) {
       try {
         const pendingTests = JSON.parse(pendingSyncData);
         setPendingSync(pendingTests);
-        
+
         if (navigator.onLine && user) {
           syncPendingDataWithServer();
         }
@@ -1162,21 +1162,21 @@ export default function Stats() {
         localStorage.removeItem("typingPendingSync");
       }
     }
-    
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
   }, [user]);
-  
+
   // Function to sync pending data with server
   const syncPendingDataWithServer = async () => {
     if (!user || !navigator.onLine || pendingSync.length === 0) return;
-    
+
     try {
       const { saveTypingStats } = await import("@/services/userService");
       let syncedCount = 0;
-      
+
       // Process each pending test in sequence
       for (const test of pendingSync) {
         try {
@@ -1196,18 +1196,18 @@ export default function Stats() {
           // Continue with next test
         }
       }
-      
+
       if (syncedCount > 0) {
         // Update the pending sync list to remove synced items
         const remainingTests = pendingSync.slice(syncedCount);
         setPendingSync(remainingTests);
-        
+
         if (remainingTests.length > 0) {
           localStorage.setItem("typingPendingSync", JSON.stringify(remainingTests));
         } else {
           localStorage.removeItem("typingPendingSync");
         }
-        
+
         toast({
           title: "Data synced",
           description: `${syncedCount} test results were synchronized with your profile.`,
@@ -1222,7 +1222,7 @@ export default function Stats() {
     <ThemeProvider>
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-background/90">
         <Header />
-        
+
         <main className="flex-grow flex flex-col p-6 pt-24 pb-20">
           <div className="container max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-8">
@@ -1230,8 +1230,8 @@ export default function Stats() {
                 <BarChart2 className="h-8 w-8 text-primary" />
                 <h1 className="text-3xl md:text-4xl font-bold gradient-heading">Your Statistics</h1>
               </div>
-              
-              <Button 
+
+              <Button
                 variant="destructive"
                 size="sm"
                 onClick={clearAllStats}
@@ -1241,7 +1241,7 @@ export default function Stats() {
                 Clear Stats
               </Button>
             </div>
-            
+
             {progressData.length === 0 ? (
               <Card className="shadow-card border-border/30 mb-4">
                 <CardContent className="pt-6 pb-6">
@@ -1259,7 +1259,7 @@ export default function Stats() {
                   <TabsTrigger value="details" className="rounded-md">Details</TabsTrigger>
                   <TabsTrigger value="summary" className="rounded-md">Summary</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="progress" className="animate-scale-in">
                   <div className="grid grid-cols-1 gap-6 mb-6">
                     <Card className="shadow-card border-border/30 overflow-hidden">
@@ -1286,7 +1286,7 @@ export default function Stats() {
                               <YAxis yAxisId="left" domain={[0, 'auto']} />
                               <YAxis yAxisId="right" orientation="right" domain={[80, 100]} />
                               <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                              <Tooltip 
+                              <Tooltip
                                 formatter={(value, name) => {
                                   if (name === 'wpm') return [`${value} WPM`, 'Speed'];
                                   if (name === 'accuracy') return [`${value}%`, 'Accuracy'];
@@ -1294,23 +1294,23 @@ export default function Stats() {
                                   return [value, name];
                                 }}
                               />
-                              <Area 
+                              <Area
                                 yAxisId="left"
-                                type="monotone" 
-                                dataKey="wpm" 
+                                type="monotone"
+                                dataKey="wpm"
                                 name="WPM"
-                                stroke="hsl(var(--primary))" 
-                                fillOpacity={1} 
-                                fill="url(#colorWpm)" 
+                                stroke="hsl(var(--primary))"
+                                fillOpacity={1}
+                                fill="url(#colorWpm)"
                               />
-                              <Area 
+                              <Area
                                 yAxisId="right"
-                                type="monotone" 
-                                dataKey="accuracy" 
+                                type="monotone"
+                                dataKey="accuracy"
                                 name="Accuracy"
-                                stroke="hsl(var(--accent))" 
-                                fillOpacity={1} 
-                                fill="url(#colorAcc)" 
+                                stroke="hsl(var(--accent))"
+                                fillOpacity={1}
+                                fill="url(#colorAcc)"
                               />
                               <Legend />
                             </AreaChart>
@@ -1319,7 +1319,7 @@ export default function Stats() {
                       </CardContent>
                     </Card>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     {improvementInsights.map((insight, index) => (
                       <Card key={index} className={`shadow-card border-border/30 overflow-hidden hover:shadow-lg transition-all ${insight.positive ? 'border-l-4 border-l-green-500' : insight.change === 0 ? '' : 'border-l-4 border-l-red-500'}`}>
@@ -1351,7 +1351,7 @@ export default function Stats() {
                       </Card>
                     ))}
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card className="shadow-card border-border/30 overflow-hidden">
                       <CardHeader className="bg-background/50">
@@ -1367,19 +1367,19 @@ export default function Stats() {
                               <YAxis />
                               <Tooltip />
                               <Legend />
-                              <Line 
-                                type="monotone" 
-                                dataKey="wpm" 
-                                stroke="hsl(var(--primary))" 
+                              <Line
+                                type="monotone"
+                                dataKey="wpm"
+                                stroke="hsl(var(--primary))"
                                 activeDot={{ r: 8 }}
-                                strokeWidth={2} 
+                                strokeWidth={2}
                               />
                             </LineChart>
                           </ResponsiveContainer>
                         </div>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="shadow-card border-border/30 overflow-hidden">
                       <CardHeader className="bg-background/50">
                         <CardTitle>Accuracy Progress</CardTitle>
@@ -1394,10 +1394,10 @@ export default function Stats() {
                               <YAxis domain={[80, 100]} />
                               <Tooltip />
                               <Legend />
-                              <Line 
-                                type="monotone" 
-                                dataKey="accuracy" 
-                                stroke="hsl(var(--accent))" 
+                              <Line
+                                type="monotone"
+                                dataKey="accuracy"
+                                stroke="hsl(var(--accent))"
                                 activeDot={{ r: 8 }}
                                 strokeWidth={2}
                               />
@@ -1408,7 +1408,7 @@ export default function Stats() {
                     </Card>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="mistakes" className="animate-scale-in">
                   <Card className="shadow-card border-border/30 overflow-hidden mb-6">
                     <CardHeader className="bg-background/50">
@@ -1422,7 +1422,7 @@ export default function Stats() {
                             <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                             <XAxis dataKey="letter" />
                             <YAxis />
-                            <Tooltip 
+                            <Tooltip
                               content={({ active, payload }) => {
                                 if (active && payload && payload.length) {
                                   const data = payload[0].payload as MistakeData;
@@ -1445,7 +1445,7 @@ export default function Stats() {
                       </div>
                     </CardContent>
                   </Card>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card className="shadow-card border-border/30 overflow-hidden">
                       <CardHeader className="bg-background/50">
@@ -1472,9 +1472,9 @@ export default function Stats() {
                                     const keyPercentage = row.totalErrors > 0
                                       ? parseFloat(((keyCount / row.totalErrors) * 100).toFixed(1))
                                       : 0;
-                                    
+
                                     return (
-                                      <Badge 
+                                      <Badge
                                         key={key}
                                         variant={keyCount > 0 ? "default" : "outline"}
                                         className={`font-mono ${keyCount > 0 ? "bg-incorrect/20 text-incorrect hover:bg-incorrect/30" : ""}`}
@@ -1486,9 +1486,9 @@ export default function Stats() {
                                 </div>
                               </div>
                             ))}
-                            
+
                             <Separator className="my-4" />
-                            
+
                             <div className="space-y-4">
                               <h4 className="text-sm font-medium flex items-center gap-2">
                                 <Brain className="h-4 w-4 text-primary" />
@@ -1501,9 +1501,9 @@ export default function Stats() {
                                     {Math.min(100, Math.round(100 - (frequentMistakes.slice(0, 5).reduce((sum, m) => sum + m.percentage!, 0) / 2)))}%
                                   </span>
                                 </div>
-                                <Progress 
-                                  value={Math.min(100, Math.round(100 - (frequentMistakes.slice(0, 5).reduce((sum, m) => sum + m.percentage!, 0) / 2)))} 
-                                  className="h-2" 
+                                <Progress
+                                  value={Math.min(100, Math.round(100 - (frequentMistakes.slice(0, 5).reduce((sum, m) => sum + m.percentage!, 0) / 2)))}
+                                  className="h-2"
                                 />
                                 <p className="text-xs text-muted-foreground mt-2">
                                   Fixing your top 5 most frequent mistakes could improve your accuracy by approximately{" "}
@@ -1529,9 +1529,9 @@ export default function Stats() {
                                 ))}
                               </ul>
                             </div>
-                            
+
                             <Separator className="my-4" />
-                            
+
                             <div className="space-y-3">
                               <h4 className="text-sm font-medium flex items-center gap-2">
                                 <KeyboardIcon className="h-4 w-4 text-primary" />
@@ -1544,8 +1544,8 @@ export default function Stats() {
                                       const keyMistake = frequentMistakes.find(m => m.letter === key.toLowerCase());
                                       const hasErrors = keyMistake && keyMistake.count > 0;
                                       return (
-                                        <div 
-                                          key={key} 
+                                        <div
+                                          key={key}
                                           className={`w-7 h-7 rounded-md border flex items-center justify-center text-xs font-medium ${
                                             hasErrors ? "bg-incorrect/20 border-incorrect/30 text-incorrect" : "bg-background border-border"
                                           }`}
@@ -1560,8 +1560,8 @@ export default function Stats() {
                                       const keyMistake = frequentMistakes.find(m => m.letter === key.toLowerCase());
                                       const hasErrors = keyMistake && keyMistake.count > 0;
                                       return (
-                                        <div 
-                                          key={key} 
+                                        <div
+                                          key={key}
                                           className={`w-7 h-7 rounded-md border flex items-center justify-center text-xs font-medium ${
                                             hasErrors ? "bg-incorrect/20 border-incorrect/30 text-incorrect" : "bg-background border-border"
                                           } ${key === "F" || key === "J" ? "border-primary/50" : ""}`}
@@ -1576,8 +1576,8 @@ export default function Stats() {
                                       const keyMistake = frequentMistakes.find(m => m.letter === key.toLowerCase());
                                       const hasErrors = keyMistake && keyMistake.count > 0;
                                       return (
-                                        <div 
-                                          key={key} 
+                                        <div
+                                          key={key}
                                           className={`w-7 h-7 rounded-md border flex items-center justify-center text-xs font-medium ${
                                             hasErrors ? "bg-incorrect/20 border-incorrect/30 text-incorrect" : "bg-background border-border"
                                           }`}
@@ -1598,7 +1598,7 @@ export default function Stats() {
                         </ScrollArea>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="shadow-card border-border/30 overflow-hidden">
                       <CardHeader className="bg-background/50">
                         <CardTitle className="flex items-center gap-2">
@@ -1613,7 +1613,7 @@ export default function Stats() {
                             {frequentMistakes.slice(0, 3).map((mistake, index) => {
                               // Generate practice words containing the problem character
                               const practiceWords = getPracticeWordsForCharacter(mistake.letter);
-                              
+
                               return (
                                 <Collapsible key={index} className="border border-border rounded-md">
                                   <CollapsibleTrigger className="flex items-center justify-between w-full p-4">
@@ -1629,11 +1629,11 @@ export default function Stats() {
                                         {mistake.suggestion}
                                       </p>
                                     </div>
-                                    
+
                                     <div className="bg-muted p-3 rounded-md font-mono text-sm mb-3">
                                       {practiceWords.join(" ")}
                                     </div>
-                                    
+
                                     <div className="mb-3 bg-primary/5 p-3 rounded-md">
                                       <h5 className="text-xs font-medium flex items-center gap-1.5 mb-1.5">
                                         <Info className="h-3 w-3 text-primary" />
@@ -1645,20 +1645,20 @@ export default function Stats() {
                                         <li>Repeat these words 5 times with a short break between sets</li>
                                       </ul>
                                     </div>
-                                    
+
                                     <div className="flex flex-wrap justify-between items-center">
                                       <div className="flex items-center text-xs text-muted-foreground">
                                         <Star className="h-3 w-3 text-yellow-500 mr-1" />
                                         <span>Focused practice improves accuracy by up to 80%</span>
                                       </div>
-                                      <Button 
-                                        size="sm" 
-                                        variant="outline" 
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
                                         className="text-xs"
                                         onClick={() => {
                                           toast({
-                                            title: "Practice Mode Coming Soon",
-                                            description: "This feature will be available in a future update."
+                                            title: "Advanced Practice Mode Coming in v8.0",
+                                            description: "AI-powered personalized training with adaptive difficulty and targeted exercises for your specific weaknesses."
                                           });
                                         }}
                                       >
@@ -1669,7 +1669,7 @@ export default function Stats() {
                                 </Collapsible>
                               );
                             })}
-                            
+
                             <div className="bg-primary/5 p-4 rounded-md border border-primary/20 space-y-2">
                               <h4 className="text-sm font-medium flex items-center gap-2">
                                 <KeyboardIcon className="h-4 w-4 text-primary" />
@@ -1722,7 +1722,7 @@ export default function Stats() {
                     </Card>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="details" className="animate-scale-in">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card className="shadow-card border-border/30 overflow-hidden">
@@ -1751,13 +1751,13 @@ export default function Stats() {
                                   <Cell key={`cell-${index}`} fill={TIME_OF_DAY_COLORS[index % TIME_OF_DAY_COLORS.length]} />
                                 ))}
                               </Pie>
-                              <Tooltip 
+                              <Tooltip
                                 content={({ active, payload }) => {
                                   if (active && payload && payload.length) {
                                     const data = payload[0].payload as TimeOfDayData;
                                     const total = timeOfDayPerformance.reduce((acc, curr) => acc + curr.value, 0);
                                     const percentage = total > 0 ? Math.round((data.value / total) * 100) : 0;
-                                    
+
                                     return (
                                       <div className="bg-background p-3 rounded-md border border-border shadow-md">
                                         <p className="font-medium">{data.name}</p>
@@ -1781,7 +1781,7 @@ export default function Stats() {
                                   return null;
                                 }}
                               />
-                              <Legend 
+                              <Legend
                                 formatter={(value, entry) => {
                                   const item = timeOfDayPerformance.find(item => item.name === value);
                                   if (item) {
@@ -1817,7 +1817,7 @@ export default function Stats() {
                         </div>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="shadow-card border-border/30 overflow-hidden">
                       <CardHeader className="bg-background/50">
                         <CardTitle className="flex items-center gap-2">
@@ -1833,14 +1833,14 @@ export default function Stats() {
                               <PolarGrid strokeDasharray="3 3" />
                               <PolarAngleAxis dataKey="name" tick={{ fill: 'currentColor', fontSize: 12 }} />
                               <PolarRadiusAxis angle={30} domain={[0, 'auto']} />
-                              <Radar 
-                                name="WPM" 
-                                dataKey="wpm" 
-                                stroke="hsl(var(--primary))" 
-                                fill="hsl(var(--primary))" 
-                                fillOpacity={0.6} 
+                              <Radar
+                                name="WPM"
+                                dataKey="wpm"
+                                stroke="hsl(var(--primary))"
+                                fill="hsl(var(--primary))"
+                                fillOpacity={0.6}
                               />
-                              <Tooltip 
+                              <Tooltip
                                 content={({ active, payload }) => {
                                   if (active && payload && payload.length) {
                                     const data = payload[0].payload;
@@ -1869,13 +1869,13 @@ export default function Stats() {
                           <div className="flex justify-between items-center">
                             <h4 className="text-sm font-medium">Weekday Analysis</h4>
                             <span className="text-xs text-muted-foreground">
-                              {weekdayPerformance.some(day => day.count > 0) 
-                                ? `Best day: ${weekdayPerformance.reduce((best, current) => 
+                              {weekdayPerformance.some(day => day.count > 0)
+                                ? `Best day: ${weekdayPerformance.reduce((best, current) =>
                                     current.wpm > best.wpm ? current : best, weekdayPerformance[0]).name}`
                                 : 'No data yet'}
                             </span>
                           </div>
-                          
+
                           <div className="grid grid-cols-2 gap-2">
                             {weekdayPerformance
                               .filter(day => day.count > 0)
@@ -1883,9 +1883,9 @@ export default function Stats() {
                               .slice(0, 3)
                               .map((day, index) => (
                                 <div key={index} className="flex items-center space-x-2 p-2 rounded-md bg-muted/30 text-xs">
-                                  <div className={`w-5 h-5 rounded-full flex items-center justify-center 
-                                    ${index === 0 ? 'bg-yellow-500/20 text-yellow-500' : 
-                                      index === 1 ? 'bg-gray-500/20 text-gray-500' : 
+                                  <div className={`w-5 h-5 rounded-full flex items-center justify-center
+                                    ${index === 0 ? 'bg-yellow-500/20 text-yellow-500' :
+                                      index === 1 ? 'bg-gray-500/20 text-gray-500' :
                                         'bg-amber-700/20 text-amber-700'}`}>
                                     {index + 1}
                                   </div>
@@ -1895,16 +1895,16 @@ export default function Stats() {
                                   </div>
                                 </div>
                               ))}
-                            
+
                             <div className="col-span-2 px-3 py-2 bg-primary/5 rounded-md border border-primary/20 text-xs">
                               <div className="flex items-start space-x-2">
                                 <Info className="h-3.5 w-3.5 text-primary mt-0.5 flex-shrink-0" />
                                 <p className="text-muted-foreground">
-                                  {weekdayPerformance.some(day => day.count > 0) 
-                                    ? `Your typing speed is ${weekdayPerformance.reduce((a, b) => a + (b.wpm * b.count), 0) / 
-                                        Math.max(1, weekdayPerformance.reduce((a, b) => a + b.count, 0)) > 80 ? 'excellent' : 'good'} 
+                                  {weekdayPerformance.some(day => day.count > 0)
+                                    ? `Your typing speed is ${weekdayPerformance.reduce((a, b) => a + (b.wpm * b.count), 0) /
+                                        Math.max(1, weekdayPerformance.reduce((a, b) => a + b.count, 0)) > 80 ? 'excellent' : 'good'}
                                       on weekdays and ${weekdayPerformance.filter(d => d.name === 'Saturday' || d.name === 'Sunday')
-                                        .reduce((a, b) => a + (b.wpm * b.count), 0) / 
+                                        .reduce((a, b) => a + (b.wpm * b.count), 0) /
                                         Math.max(1, weekdayPerformance.filter(d => d.name === 'Saturday' || d.name === 'Sunday')
                                         .reduce((a, b) => a + b.count, 0)) > 80 ? 'excellent' : 'good'} on weekends.`
                                     : 'Complete more tests to see day-of-week patterns in your typing performance.'}
@@ -1915,7 +1915,7 @@ export default function Stats() {
                         </div>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="shadow-card border-border/30 overflow-hidden md:col-span-2">
                       <CardHeader className="bg-background/50">
                         <CardTitle className="flex items-center gap-2">
@@ -1937,20 +1937,20 @@ export default function Stats() {
                             ))}
                             <span className="text-xs text-muted-foreground">More</span>
                           </div>
-                          
+
                           <div className="grid grid-flow-row gap-2 w-full">
                             {Object.values(heatmapByWeek).map((week, weekIndex) => (
                               <div key={weekIndex} className="flex items-center justify-center space-x-1">
                                 {week.map((day, dayIndex) => {
                                   // Format the date for display
-                                  const formattedDate = new Date(day.date).toLocaleDateString(undefined, 
+                                  const formattedDate = new Date(day.date).toLocaleDateString(undefined,
                                     { weekday: 'short', month: 'short', day: 'numeric' });
-                                  
+
                                   // Calculate streak if there are consecutive days with activity
-                                  const isPartOfStreak = day.count > 0 && 
-                                    (dayIndex > 0 && week[dayIndex-1].count > 0 || 
+                                  const isPartOfStreak = day.count > 0 &&
+                                    (dayIndex > 0 && week[dayIndex-1].count > 0 ||
                                      dayIndex < week.length-1 && week[dayIndex+1].count > 0);
-                                     
+
                                   return (
                                     <div
                                       key={`${weekIndex}-${dayIndex}`}
@@ -1962,13 +1962,13 @@ export default function Stats() {
                                       title={`${formattedDate}: ${day.count} test${day.count !== 1 ? 's' : ''} ${day.performance > 0 ? `(${day.performance} WPM)` : ''}`}
                                     >
                                       {day.count > 0 && (
-                                        <span className={`text-[10px] 
+                                        <span className={`text-[10px]
                                           ${day.count > 5 ? 'text-white' : 'text-foreground'}`
                                         }>
                                           {day.count}
                                         </span>
                                       )}
-                                      
+
                                       {/* Show a small indicator for days with exceptional performance */}
                                       {day.performance > 0 && day.performance > (summaryData.averageWPM + 10) && (
                                         <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-500 rounded-full" />
@@ -1979,7 +1979,7 @@ export default function Stats() {
                               </div>
                             ))}
                           </div>
-                          
+
                           <div className="w-full mt-2">
                             <div className="flex justify-between items-center mb-3">
                               <h4 className="text-sm font-medium">Activity Statistics</h4>
@@ -1987,7 +1987,7 @@ export default function Stats() {
                                 {activityHeatmap.filter(day => day.count > 0).length} active days
                               </span>
                             </div>
-                            
+
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                               <div className="bg-muted/30 p-3 rounded-md">
                                 <div className="text-xs text-muted-foreground">Current streak</div>
@@ -1996,25 +1996,25 @@ export default function Stats() {
                                     let currentStreak = 0;
                                     const today = new Date().toISOString().split('T')[0];
                                     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-                                    
+
                                     // Check if user practiced today
                                     const todayStats = activityHeatmap.find(day => day.date === today);
                                     const hasPracticedToday = todayStats && todayStats.count > 0;
-                                    
+
                                     // Check if user practiced yesterday
                                     const yesterdayStats = activityHeatmap.find(day => day.date === yesterday);
                                     const hasPracticedYesterday = yesterdayStats && yesterdayStats.count > 0;
-                                    
+
                                     // Sort days by date descending
                                     const sortedDays = [...activityHeatmap]
                                       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-                                    
+
                                     // Count current streak (consecutive days with tests)
                                     const firstDayToCheck = hasPracticedToday ? 0 : 1;
                                     for (let i = firstDayToCheck; i < sortedDays.length; i++) {
                                       if (sortedDays[i].count > 0) {
                                         // Check if this is consecutive with previous day
-                                        if (i === firstDayToCheck || 
+                                        if (i === firstDayToCheck ||
                                            (new Date(sortedDays[i-1].date).getTime() - new Date(sortedDays[i].date).getTime()) <= 86400000) {
                                           currentStreak++;
                                         } else {
@@ -2024,28 +2024,28 @@ export default function Stats() {
                                         break;
                                       }
                                     }
-                                    
+
                                     return currentStreak;
                                   })()}
                                   <span className="text-xs text-muted-foreground ml-1">days</span>
                                 </div>
                               </div>
-                              
+
                               <div className="bg-muted/30 p-3 rounded-md">
                                 <div className="text-xs text-muted-foreground">Best day</div>
                                 <div className="text-lg font-semibold">
                                   {(() => {
                                     const activeDays = activityHeatmap.filter(day => day.count > 0);
                                     if (activeDays.length === 0) return "None";
-                                    
-                                    const bestDay = activeDays.reduce((best, current) => 
+
+                                    const bestDay = activeDays.reduce((best, current) =>
                                       current.performance > best.performance ? current : best, activeDays[0]);
-                                    
+
                                     return new Date(bestDay.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
                                   })()}
                                 </div>
                               </div>
-                              
+
                               <div className="bg-muted/30 p-3 rounded-md">
                                 <div className="text-xs text-muted-foreground">Tests this week</div>
                                 <div className="text-lg font-semibold">
@@ -2053,23 +2053,23 @@ export default function Stats() {
                                     const today = new Date();
                                     const startOfWeek = new Date(today);
                                     startOfWeek.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
-                                    
+
                                     const testsThisWeek = activityHeatmap
                                       .filter(day => new Date(day.date) >= startOfWeek)
                                       .reduce((sum, day) => sum + day.count, 0);
-                                    
+
                                     return testsThisWeek;
                                   })()}
                                 </div>
                               </div>
-                              
+
                               <div className="bg-muted/30 p-3 rounded-md">
                                 <div className="text-xs text-muted-foreground">Avg tests per active day</div>
                                 <div className="text-lg font-semibold">
                                   {(() => {
                                     const activeDays = activityHeatmap.filter(day => day.count > 0);
                                     if (activeDays.length === 0) return "0";
-                                    
+
                                     const totalTests = activeDays.reduce((sum, day) => sum + day.count, 0);
                                     return (totalTests / activeDays.length).toFixed(1);
                                   })()}
@@ -2100,7 +2100,7 @@ export default function Stats() {
                               <XAxis dataKey="level" />
                               <YAxis yAxisId="left" orientation="left" stroke="hsl(var(--primary))" />
                               <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--accent))" />
-                              <Tooltip 
+                              <Tooltip
                                 content={({ active, payload }) => {
                                   if (active && payload && payload.length) {
                                     const data = payload[0].payload as DifficultyLevelData;
@@ -2141,7 +2141,7 @@ export default function Stats() {
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
-                        
+
                         <div className="grid grid-cols-3 gap-3 mt-4">
                           {difficultyLevelStats.map((level, index) => (
                             <div key={index} className="p-3 rounded-md bg-muted/30">
@@ -2173,7 +2173,7 @@ export default function Stats() {
                         </div>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="shadow-card border-border/30 overflow-hidden">
                       <CardHeader className="bg-background/50">
                         <CardTitle className="flex items-center gap-2">
@@ -2198,7 +2198,7 @@ export default function Stats() {
                                     const data = payload[0].payload;
                                     const totalTests = speedDistribution.reduce((sum, range) => sum + range.count, 0);
                                     const percentage = totalTests > 0 ? Math.round((data.count / totalTests) * 100) : 0;
-                                    
+
                                     return (
                                       <div className="bg-background p-3 rounded-md border border-border shadow-md">
                                         <p className="font-medium">{data.range} WPM</p>
@@ -2215,11 +2215,11 @@ export default function Stats() {
                                 }}
                               />
                               <Legend />
-                              <Bar 
-                                dataKey="count" 
-                                name="Test Count" 
-                                fill="hsl(var(--secondary))" 
-                                radius={[4, 4, 0, 0]} 
+                              <Bar
+                                dataKey="count"
+                                name="Test Count"
+                                fill="hsl(var(--secondary))"
+                                radius={[4, 4, 0, 0]}
                                 // Add color gradient based on speed range
                                 fillOpacity={0.8}
                                 // Add animation
@@ -2229,7 +2229,7 @@ export default function Stats() {
                                   // Create a color gradient based on speed range
                                   const speedValue = parseInt(entry.range.split('-')[0]);
                                   let color = 'hsl(var(--secondary))';
-                                  
+
                                   if (speedValue > 80) {
                                     color = 'hsl(var(--primary))';
                                   } else if (speedValue > 60) {
@@ -2239,14 +2239,14 @@ export default function Stats() {
                                   } else {
                                     color = 'hsl(var(--muted-foreground))';
                                   }
-                                  
+
                                   return <Cell key={`cell-${index}`} fill={color} />;
                                 })}
                               </Bar>
                             </BarChart>
                           </ResponsiveContainer>
                         </div>
-                        
+
                         <div className="mt-4">
                           <div className="flex justify-between items-center mb-3">
                             <h4 className="text-sm font-medium">Speed Analysis</h4>
@@ -2255,14 +2255,14 @@ export default function Stats() {
                                 // Find most common speed range
                                 const mostCommonRange = [...speedDistribution]
                                   .sort((a, b) => b.count - a.count)[0];
-                                  
-                                return mostCommonRange ? 
-                                  `Most common: ${mostCommonRange.range} WPM (${mostCommonRange.count} tests)` 
+
+                                return mostCommonRange ?
+                                  `Most common: ${mostCommonRange.range} WPM (${mostCommonRange.count} tests)`
                                   : 'No data';
                               })()}
                             </span>
                           </div>
-                          
+
                           <div className="p-3 rounded-md bg-muted/30 text-xs">
                             <div className="flex items-start space-x-2">
                               <Info className="h-3.5 w-3.5 text-primary mt-0.5" />
@@ -2273,11 +2273,11 @@ export default function Stats() {
                                     const lowerRanges = speedDistribution.slice(0, 3).reduce((sum, range) => sum + range.count, 0);
                                     const higherRanges = speedDistribution.slice(4).reduce((sum, range) => sum + range.count, 0);
                                     const totalTests = speedDistribution.reduce((sum, range) => sum + range.count, 0);
-                                    
+
                                     if (totalTests < 5) {
                                       return "Complete more tests to see detailed speed distribution analysis.";
                                     }
-                                    
+
                                     if (higherRanges > lowerRanges) {
                                       return "Your typing speed is trending towards higher ranges. Keep up the good work!";
                                     } else if (lowerRanges > higherRanges) {
@@ -2287,7 +2287,7 @@ export default function Stats() {
                                     }
                                   })()}
                                 </p>
-                                
+
                                 <div className="flex flex-wrap gap-2 mt-1">
                                   {[
                                     { label: "Beginner", range: "0-40" },
@@ -2299,14 +2299,14 @@ export default function Stats() {
                                     const [min, max] = category.range.split('-');
                                     const categoryTests = speedDistribution.filter(range => {
                                       const [rangeMin, rangeMax] = range.range.split('-').map(n => parseInt(n || '1000'));
-                                      return (max ? 
-                                        (rangeMin >= parseInt(min) && rangeMax <= parseInt(max)) : 
+                                      return (max ?
+                                        (rangeMin >= parseInt(min) && rangeMax <= parseInt(max)) :
                                         (rangeMin >= parseInt(min)));
                                     }).reduce((sum, range) => sum + range.count, 0);
-                                    
+
                                     const totalTests = speedDistribution.reduce((sum, range) => sum + range.count, 0);
                                     const percentage = totalTests > 0 ? Math.round((categoryTests / totalTests) * 100) : 0;
-                                    
+
                                     return (
                                       <div key={index} className="bg-background px-2 py-1 rounded-md border border-border">
                                         <span className="font-medium">{category.label}:</span> {percentage}%
@@ -2320,7 +2320,7 @@ export default function Stats() {
                         </div>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="shadow-card border-border/30 overflow-hidden md:col-span-2">
                       <CardHeader className="bg-background/50">
                         <CardTitle className="flex items-center gap-2">
@@ -2347,7 +2347,7 @@ export default function Stats() {
                                       const data = payload[0].payload;
                                       const totalErrors = errorsByCharPosition.reduce((sum, pos) => sum + pos.errorCount, 0);
                                       const percentage = totalErrors > 0 ? Math.round((data.errorCount / totalErrors) * 100) : 0;
-                                      
+
                                       return (
                                         <div className="bg-background p-3 rounded-md border border-border shadow-md">
                                           <p className="font-medium">{data.position} Position</p>
@@ -2364,11 +2364,11 @@ export default function Stats() {
                                   }}
                                 />
                                 <Legend />
-                                <Bar 
-                                  dataKey="errorCount" 
-                                  name="Errors" 
-                                  fill="hsl(var(--destructive))" 
-                                  radius={[0, 4, 4, 0]} 
+                                <Bar
+                                  dataKey="errorCount"
+                                  name="Errors"
+                                  fill="hsl(var(--destructive))"
+                                  radius={[0, 4, 4, 0]}
                                 >
                                   {errorsByCharPosition.map((entry, index) => {
                                     // Create different shades based on error position
@@ -2384,7 +2384,7 @@ export default function Stats() {
                               </BarChart>
                             </ResponsiveContainer>
                           </div>
-                          
+
                           <div className="space-y-4">
                             <div className="p-4 rounded-md bg-muted/30">
                               <h4 className="text-sm font-medium mb-2">Error Analysis</h4>
@@ -2392,7 +2392,7 @@ export default function Stats() {
                                 {errorsByCharPosition.map((position, index) => {
                                   const totalErrors = errorsByCharPosition.reduce((sum, pos) => sum + pos.errorCount, 0);
                                   const percentage = totalErrors > 0 ? Math.round((position.errorCount / totalErrors) * 100) : 0;
-                                  
+
                                   return (
                                     <div key={index} className="space-y-1">
                                       <div className="flex justify-between items-center text-xs">
@@ -2405,7 +2405,7 @@ export default function Stats() {
                                 })}
                               </div>
                             </div>
-                            
+
                             <div className="p-4 rounded-md bg-primary/5 border border-primary/20">
                               <h4 className="text-sm font-medium flex items-center gap-1.5 mb-2">
                                 <Info className="h-3.5 w-3.5 text-primary" />
@@ -2416,9 +2416,9 @@ export default function Stats() {
                                   const totalErrors = errorsByCharPosition.reduce((sum, pos) => sum + pos.errorCount, 0);
                                   const sortedPositions = [...errorsByCharPosition].sort((a, b) => b.errorCount - a.errorCount);
                                   const worstPosition = sortedPositions[0]?.position;
-                                  
+
                                   const tips = [];
-                                  
+
                                   // Add position-specific tips
                                   if (worstPosition === "First") {
                                     tips.push("Focus on proper finger positioning before starting a word");
@@ -2433,11 +2433,11 @@ export default function Stats() {
                                     tips.push("Use your thumb consistently for the spacebar");
                                     tips.push("Maintain steady rhythm when transitioning between words");
                                   }
-                                  
+
                                   // Add general tips
                                   tips.push("Slow down slightly to improve accuracy before working on speed");
                                   tips.push("Focus on problematic areas during practice sessions");
-                                  
+
                                   return tips.map((tip, index) => (
                                     <li key={index}>{tip}</li>
                                   ));
@@ -2448,7 +2448,7 @@ export default function Stats() {
                         </div>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="shadow-card border-border/30 overflow-hidden md:col-span-2">
                       <CardHeader className="bg-background/50 flex flex-row items-center justify-between space-y-0 pb-2">
                         <div>
@@ -2458,15 +2458,15 @@ export default function Stats() {
                           </CardTitle>
                           <CardDescription>Your last 10 typing test results</CardDescription>
                         </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
+                        <Button
+                          variant="outline"
+                          size="sm"
                           className="text-xs"
                           onClick={() => {
                             // Sort the tests again by date, newest first
                             const sortedTests = [...progressData].sort((a, b) => b.date - a.date);
                             setRecentTests(sortedTests.slice(0, 10));
-                            
+
                             toast({
                               title: "Tests refreshed",
                               description: "Showing your most recent tests",
@@ -2497,11 +2497,11 @@ export default function Stats() {
                                   const wpmDiff = test.wpm - summaryData.averageWPM;
                                   const percentDiff = Math.round((wpmDiff / Math.max(1, summaryData.averageWPM)) * 100);
                                   const isPrevious = index === 1;
-                                  
+
                                   // Format date and time
                                   const testDate = new Date(test.date);
                                   const formattedDate = testDate.toLocaleDateString(undefined, {
-                                    month: 'short', 
+                                    month: 'short',
                                     day: 'numeric',
                                     year: 'numeric'
                                   });
@@ -2509,11 +2509,11 @@ export default function Stats() {
                                     hour: '2-digit',
                                     minute: '2-digit'
                                   });
-                                  
+
                                   // Calculate performance trend compared to previous test
                                   const prevTest = recentTests[index + 1];
                                   const wpmTrend = prevTest ? test.wpm - prevTest.wpm : 0;
-                                  
+
                                   return (
                                     <TableRow key={index} className={index === 0 ? "bg-muted/20" : ""}>
                                       <TableCell>
@@ -2534,8 +2534,8 @@ export default function Stats() {
                                       </TableCell>
                                       <TableCell>
                                         <span className={`
-                                          ${test.accuracy >= 98 ? 'text-green-500' : 
-                                            test.accuracy >= 95 ? 'text-primary' : 
+                                          ${test.accuracy >= 98 ? 'text-green-500' :
+                                            test.accuracy >= 95 ? 'text-primary' :
                                             test.accuracy >= 90 ? 'text-amber-500' : 'text-red-500'}
                                         `}>
                                           {test.accuracy}%
@@ -2552,10 +2552,10 @@ export default function Stats() {
                                         </div>
                                       </TableCell>
                                       <TableCell>
-                                        {wpmDiff > 5 ? 
+                                        {wpmDiff > 5 ?
                                           <Badge variant="success" className="gap-1">
                                             <TrendingUp className="h-3 w-3" /> {percentDiff > 0 ? '+' : ''}{percentDiff}%
-                                          </Badge> : 
+                                          </Badge> :
                                           wpmDiff < -5 ?
                                           <Badge variant="destructive" className="gap-1">
                                             <TrendingUp className="h-3 w-3 rotate-180" /> {percentDiff > 0 ? '+' : ''}{percentDiff}%
@@ -2567,15 +2567,15 @@ export default function Stats() {
                                         <Badge
                                           variant="outline"
                                           className={`
-                                            ${!test.difficulty || test.difficulty === 'intermediate' ? 'bg-primary/10 text-primary border-primary/20' : 
-                                              test.difficulty === 'beginner' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 
-                                              test.difficulty === 'advanced' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 
-                                              test.difficulty === 'code' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 
+                                            ${!test.difficulty || test.difficulty === 'intermediate' ? 'bg-primary/10 text-primary border-primary/20' :
+                                              test.difficulty === 'beginner' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
+                                              test.difficulty === 'advanced' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+                                              test.difficulty === 'code' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
                                               'bg-muted text-muted-foreground'}
                                           `}
                                         >
-                                          {test.difficulty ? 
-                                            test.difficulty.charAt(0).toUpperCase() + test.difficulty.slice(1) : 
+                                          {test.difficulty ?
+                                            test.difficulty.charAt(0).toUpperCase() + test.difficulty.slice(1) :
                                             'Intermediate'}
                                         </Badge>
                                       </TableCell>
@@ -2593,9 +2593,9 @@ export default function Stats() {
                               <p className="text-sm text-muted-foreground mt-2">
                                 Complete typing tests to see your results here
                               </p>
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
+                              <Button
+                                variant="outline"
+                                size="sm"
                                 className="mt-4"
                                 onClick={() => {
                                   // Navigate to typing page
@@ -2622,7 +2622,7 @@ export default function Stats() {
                         <p className="text-5xl font-bold text-center gradient-heading">{summaryData.averageWPM}</p>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="shadow-card border-border/30 card-hover">
                       <CardHeader className="bg-background/50">
                         <CardTitle>Average Accuracy</CardTitle>
@@ -2631,7 +2631,7 @@ export default function Stats() {
                         <p className="text-5xl font-bold text-center gradient-heading">{summaryData.averageAccuracy}%</p>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="shadow-card border-border/30 card-hover">
                       <CardHeader className="bg-background/50">
                         <CardTitle>Tests Completed</CardTitle>
@@ -2640,7 +2640,7 @@ export default function Stats() {
                         <p className="text-5xl font-bold text-center gradient-heading">{summaryData.testsCompleted}</p>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="shadow-card border-border/30 card-hover">
                       <CardHeader className="bg-background/50">
                         <CardTitle className="flex items-center"><TrendingUp className="h-4 w-4 mr-2" /> Improvement Rate</CardTitle>
@@ -2650,7 +2650,7 @@ export default function Stats() {
                         <p className="text-center text-xs text-muted-foreground mt-2">Compared to your first tests</p>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="shadow-card border-border/30 card-hover">
                       <CardHeader className="bg-background/50">
                         <CardTitle className="flex items-center"><Award className="h-4 w-4 mr-2" /> Consistency Score</CardTitle>
@@ -2660,7 +2660,7 @@ export default function Stats() {
                         <p className="text-center text-xs text-muted-foreground mt-2">Based on your speed variation</p>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="shadow-card border-border/30 card-hover">
                       <CardHeader className="bg-background/50">
                         <CardTitle className="flex items-center"><Calendar className="h-4 w-4 mr-2" /> Average Tests</CardTitle>
@@ -2670,31 +2670,31 @@ export default function Stats() {
                         <p className="text-center text-xs text-muted-foreground mt-2">Tests per day</p>
                       </CardContent>
                     </Card>
-                    
-                    <Collapsible 
+
+                    <Collapsible
                       className="md:col-span-3 shadow-card border-border/30 overflow-hidden bg-card rounded-xl"
                       open={isAnalysisOpen}
                       onOpenChange={setIsAnalysisOpen}
                     >
                       <CollapsibleTrigger asChild>
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           className="w-full flex justify-between items-center py-4 px-6"
                         >
                           <div className="flex items-center">
                             <Brain className="h-5 w-5 mr-2 text-primary" />
                             <span className="text-lg font-medium">Typing Analysis</span>
                           </div>
-                          {isAnalysisOpen ? 
-                            <ChevronUp className="h-5 w-5 text-muted-foreground" /> : 
+                          {isAnalysisOpen ?
+                            <ChevronUp className="h-5 w-5 text-muted-foreground" /> :
                             <ChevronDown className="h-5 w-5 text-muted-foreground" />
                           }
                         </Button>
                       </CollapsibleTrigger>
-                      
+
                       <CollapsibleContent>
                         <div className="p-6 bg-card/50">
-                          <TypingHeatmap 
+                          <TypingHeatmap
                             errorData={
                               (() => {
                                 // Get error data from localStorage
@@ -2708,12 +2708,12 @@ export default function Stats() {
                                 }
                                 return {};
                               })()
-                            } 
+                            }
                           />
                         </div>
                       </CollapsibleContent>
                     </Collapsible>
-                    
+
                     <Card className="md:col-span-3 shadow-card border-border/30 overflow-hidden">
                       <CardHeader className="bg-background/50">
                         <CardTitle>Personal Bests</CardTitle>
@@ -2735,7 +2735,7 @@ export default function Stats() {
                         </div>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="md:col-span-3 shadow-card border-border/30 overflow-hidden">
                       <CardHeader className="bg-background/50">
                         <CardTitle>Typing Milestones</CardTitle>
@@ -2744,7 +2744,7 @@ export default function Stats() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <div className="p-6 bg-background/70 rounded-xl text-center shadow-soft border border-border/30">
                             <h3 className="text-sm text-muted-foreground mb-2">
-                              <Clock className="h-4 w-4 inline mr-1" /> 
+                              <Clock className="h-4 w-4 inline mr-1" />
                               Total Time
                             </h3>
                             <p className="text-3xl font-bold gradient-heading">{summaryData.totalTestTime} min</p>
@@ -2764,9 +2764,9 @@ export default function Stats() {
                 </TabsContent>
               </Tabs>
             )}
-            
+
             <div className="mt-4 sm:hidden">
-              <Button 
+              <Button
                 variant="destructive"
                 size="sm"
                 onClick={clearAllStats}
@@ -2778,9 +2778,9 @@ export default function Stats() {
             </div>
           </div>
         </main>
-        
+
         <Footer />
       </div>
     </ThemeProvider>
   );
-} 
+}

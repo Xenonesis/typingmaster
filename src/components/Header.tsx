@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "./ThemeToggle";
-import { useTheme } from "@/context/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/context/AuthContext";
 import { 
   BarChart2,
@@ -131,13 +131,13 @@ export function Header() {
 
   const navItems = [
     { label: "Home", href: "/" },
-    { label: "Typing Test", href: "#/typing-test" },
-    { label: "Stats", href: "#/stats" },
-    { label: "Leaderboard", href: "#/leaderboard" },
-    { label: "Achievements", href: "#/achievements" },
-    { label: "Multiplayer", href: "#/multiplayer" },
-    { label: "Updates", href: "#/updates" },
-    { label: "About", href: "#/about" },
+    { label: "Typing Test", href: "/typing-test" },
+    { label: "Stats", href: "/stats" },
+    { label: "Leaderboard", href: "/leaderboard" },
+    { label: "Achievements", href: "/achievements" },
+    { label: "Multiplayer", href: "/multiplayer" },
+    { label: "Updates", href: "/updates" },
+    { label: "About", href: "/about" },
   ];
 
   return (
